@@ -30,8 +30,6 @@ export default class AuthService {
             username: userInfo.username,
             name: userInfo.name,
             email: userInfo.email,
-            tagNumber: userInfo.tagNumber,
-            tagState: userInfo.tagState
         }).then(res => console.log(res)).catch(err => console.log(err));
     }
 

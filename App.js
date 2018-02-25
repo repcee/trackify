@@ -41,10 +41,11 @@ export default class App extends Component {
   }
 
   register = (userInfo) => {
+    this.clearError();
     AuthService.register(userInfo.email, userInfo.password)
       .then(res => {
         AuthService.updateUser(res.uid, userInfo);
-        this.login(userInfo.username, userInfo.password);
+        // this.login(userInfo.username, userInfo.password);
       })
       .catch(err => this.setState({ error: err.toString().replace('Error: ', '') }));
   }
@@ -63,6 +64,10 @@ export default class App extends Component {
     });
   }
 
+  clearError = () => {
+    this.setState({error: ''});
+  }
+
   render() {
     return (
       this.state.isLoggedIn ?
@@ -76,6 +81,7 @@ export default class App extends Component {
           {
             login: (username, password) => this.login(username, password),
             register: (account) => this.register(account),
+            clearError: () => this.clearError(),
             isLoading: this.state.isLoading,
             error: this.state.error
           }} />
