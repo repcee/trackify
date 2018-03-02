@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import { Dimensions, KeyboardAvoidingView, StyleSheet, Text, View, Image, ImageBackground, TouchableHighlight } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, Image, ImageBackground, TouchableWithoutFeedback, Animated, Easing } from 'react-native';
 import { Button, Input } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import DeviceInfo from 'react-native-device-info';
+import Pulse from './Pulse';
+import Modal from 'react-native-modal';
 
 export default class Home extends Component {
 
@@ -10,120 +13,100 @@ export default class Home extends Component {
         this.state = {
             height: undefined,
             width: undefined,
-            username: undefined,
-            password: undefined
+            checkedIn: false,
+            circles: [],
+            toggleViewDeviceInfo: false
         };
     }
 
     componentWillMount() {
         const { width, height } = Dimensions.get('window');
         this.setState({ width, height });
+        setInterval(() => this.setState({circles: [...this.state.circles, 1]}), 1500);
     }
 
-    login = () => {
-
-        const { username, password } = this.state;
-
-        this.props.screenProps.login(username, password);
-        // this.props.navigation.navigate('Login');
-    }
-
-    register = () => {
-        this.props.navigation.navigate('Register');
-    }
-
-    isRegisteredDisabled() {
-
-        const { username, password } = this.state;
-
-        if (!username || !password) {
-            return true;
-        }
-        return false;
+    checkIn() {
+        console.log('checkin')
+        this.setState({checkedIn: !this.state.checkedIn})
     }
 
     render() {
 
         const { height, width } = this.state;
+        const deviceInfo = DeviceInfo.getUniqueID();
 
         return (
             <View style={styles.mainContainer}>
-                <ImageBackground blurRadius={25} source={require('../../Assets/bg-image.jpeg')} style={styles.backgroundImage}>
-                    <KeyboardAvoidingView width={width - 50} height={height - 50} isVisible={true}>
-                        <View style={styles.contentContainer}>
-                            <View style={styles.topContainer}>
-                                {/* <Text style={styles.logoText}>Trackify</Text> */}
-                                <Image resizeMode='contain' source={require('../../Assets/trackify-logo2.png')} style={{height: 200, width: 200}} />
-                            </View>
-                            <View style={{ marginLeft: 25, marginRight: 25 }}>
-                                <Text style={{ color: '#FF5E5B', fontWeight: 'bold', alignSelf: 'center' }}>{this.props.screenProps.error}</Text>
-                                <Input containerStyle={{ borderBottomWidth: 0 }} placeholder='username' leftIcon={<Icon name='user' size={24} color='#4c4c4c' />} autoCapitalize='none' onChangeText={(username) => this.setState({ username })} />
-                                <Input containerStyle={{ borderBottomWidth: 0 }} placeholder='password' leftIcon={<Icon name='lock' size={24} color='#4c4c4c' />} autoCapitalize='none' secureTextEntry={true} onChangeText={(password) => this.setState({ password })} onSubmitEditing={() => this.login()} />
-                            </View>
-                            <Button disabled={this.isRegisteredDisabled()} text='LOGIN' onPress={() => this.login()} buttonStyle={[styles.loginButton, { width: width / 1.5 }, this.isRegisteredDisabled() && { opacity: 0.5 }]} />
-                            {/* <Button text='REGISTER' onPress={() => this.register()} buttonStyle={[styles.registerButton, { width: width / 1.5 }]} /> */}
-                            <View style={{flex: 1, alignItems:'center', justifyContent:'flex-end'}}>
-                                <Text>Don't have an account?</Text>
-                                <Text style={{color:'#5386E4', textDecorationLine:'underline'}} onPress={() => this.register()} >Sign Up</Text>
+                <View style={styles.topContainer}>
+                <TouchableWithoutFeedback onPress={() => this.checkIn()} style={{zIndex: 1}}>
+                    <View style={styles.checkInButton}>
+                        {
+                            this.state.checkedIn ?
+                                <Icon name='check' size={75} color='#7DD892' /> :
+                                <Image source={require('../../Assets/trackify-logo2.png')} style={{height: 100, width: 100}}/>
+                        }
+                    </View>
+                    </TouchableWithoutFeedback>
+                    {!this.state.checkedIn && this.state.circles.map((circle, i) => <Pulse key={i}/>)}
+                </View>
+                <View style={{flex: 1}}>
+                    {
+                        this.state.checkedIn ?
+                            <Text style={{fontSize: 18}}>You have successfully checked in to class</Text> :
+                            <Text style={{fontSize: 18}}>You have not yet checked in to class</Text>
+                    }
+                </View>
+                <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
+                    <View style={{flex: 1, flexDirection: 'row'}}>
+                        <Icon name='tablet' size={35} onPress={() => this.setState({toggleViewDeviceInfo: true})} />
+                    </View>
+                    {/* <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                        <Text>Test</Text>
+                    </View> */}
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
+                        <Icon name='info-circle' size={35} />
+                    </View>
+                </View>
+                <Modal
+                    isVisible={this.state.toggleViewDeviceInfo}
+                    onBackdropPress={() => this.setState({toggleViewDeviceInfo: false})}>
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{backgroundColor: 'white', height: 200, width: 300, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}>
+                            <View style={{flex: 1, alignSelf: 'stretch', alignItems: 'flex-end', margin: 10}}><Icon name='close' size={25} onPress={() => this.setState({toggleViewDeviceInfo: false})} /></View>
+                            <View style={{flex: 2, alignItems: 'center'}}>
+                                <Text style={{fontSize: 18}}>Welcome! Your device's id is</Text>
+                                <Text style={{fontSize: 24, fontWeight: 'bold'}}>{deviceInfo}</Text>
                             </View>
                         </View>
-                    </KeyboardAvoidingView>
-                </ImageBackground>
+                    </View>
+                </Modal>
             </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    loginButton: {
-        marginTop: 15,
-        backgroundColor: "#5386E4",
-        width: 300,
-        height: 45,
-        borderColor: "transparent",
-        borderWidth: 0,
-        borderRadius: 100
-    },
-    registerButton: {
-        marginTop: 15,
-        marginBottom: 15,
-        backgroundColor: "#ED6A5A",
-        width: 300,
-        height: 45,
-        borderColor: "transparent",
-        borderWidth: 0,
-        borderRadius: 100
-    },
     mainContainer: {
         flex: 1,
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
     },
-    logoText: {
-        fontWeight: 'bold',
-        fontStyle: 'italic',
-        fontSize: 65,
-        color: '#4c4c4c'
-    },
-    contentContainer: {
-        flex: 1,
-        alignSelf: 'stretch',
-        backgroundColor: 'rgba(0,0,0,0)'
-    },
-    backgroundImage: {
-        flex: 1,
+    topContainer: {
+        flex: 8,
+        backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
         alignSelf: 'stretch'
     },
-    topContainer: {
-        flex: 6,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    buttonText: {
-        color: 'white',
-        fontWeight: 'bold'
-    },
+    checkInButton: {
+        elevation: 25,
+        alignSelf: 'center',
+        height: 200,
+        width: 200,
+        borderRadius: 200,
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center'
+    }
 });

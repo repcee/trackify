@@ -18,7 +18,8 @@ export default class Register extends Component {
                 password: undefined,
                 email: undefined
             },
-            usernameExists: false
+            usernameExists: false,
+            page: 0
         };
     }
 
