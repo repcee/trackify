@@ -20,10 +20,25 @@ export default class Home extends Component {
         };
     }
 
+    // componentDidMount() {
+    //     navigator.geolocation.getCurrentPosition(
+    //       (position) => {
+    //         console.log(position);
+    //         this.setState({
+    //           latitude: position.coords.latitude,
+    //           longitude: position.coords.longitude,
+    //           error: null,
+    //         });
+    //       },
+    //       (error) => this.setState({ error: error.message }),
+    //       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+    //     );
+    // }
+
     componentWillMount() {
         const { width, height } = Dimensions.get('window');
         this.setState({ width, height });
-        setInterval(() => this.setState({circles: [...this.state.circles, 1]}), 2100);
+        setInterval(() => this.setState({circles: [...this.state.circles, 1]}), 2000);
     }
 
     checkIn() {
@@ -61,9 +76,6 @@ export default class Home extends Component {
                     <View style={{flex: 1, flexDirection: 'row'}}>
                         <Icon name='tablet' size={35} onPress={() => this.setState({toggleViewDeviceInfo: true})} />
                     </View>
-                    {/* <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                        <Text>Test</Text>
-                    </View> */}
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
                         <Icon name='info-circle' size={35} />
                     </View>
@@ -72,7 +84,7 @@ export default class Home extends Component {
                     isVisible={this.state.toggleViewDeviceInfo}
                     onBackdropPress={() => this.setState({toggleViewDeviceInfo: false})}>
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <View style={{backgroundColor: 'white', height: 375, width: 300, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}>
+                        <View style={styles.modalContainer}>
                             <View style={{flex: 1, alignSelf: 'stretch', alignItems: 'flex-end', margin: 10}}><Icon name='close' size={25} onPress={() => this.setState({toggleViewDeviceInfo: false})} /></View>
                             <View style={{flex: 6, alignItems: 'center'}}>
                                 <Text style={{fontSize: 18}}>Welcome! Your device's id is</Text>
@@ -114,6 +126,14 @@ const styles = StyleSheet.create({
         width: 200,
         borderRadius: 200,
         backgroundColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    modalContainer: {
+        backgroundColor: 'white',
+        height: 375,
+        width: 300,
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center'
     }
