@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import DeviceInfo from 'react-native-device-info';
 import Pulse from './Pulse';
 import Modal from 'react-native-modal';
+import QRCode from 'react-native-qrcode';
 
 export default class Home extends Component {
 
@@ -22,7 +23,7 @@ export default class Home extends Component {
     componentWillMount() {
         const { width, height } = Dimensions.get('window');
         this.setState({ width, height });
-        setInterval(() => this.setState({circles: [...this.state.circles, 1]}), 1500);
+        setInterval(() => this.setState({circles: [...this.state.circles, 1]}), 2100);
     }
 
     checkIn() {
@@ -71,11 +72,18 @@ export default class Home extends Component {
                     isVisible={this.state.toggleViewDeviceInfo}
                     onBackdropPress={() => this.setState({toggleViewDeviceInfo: false})}>
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <View style={{backgroundColor: 'white', height: 200, width: 300, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}>
+                        <View style={{backgroundColor: 'white', height: 400, width: 300, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}>
                             <View style={{flex: 1, alignSelf: 'stretch', alignItems: 'flex-end', margin: 10}}><Icon name='close' size={25} onPress={() => this.setState({toggleViewDeviceInfo: false})} /></View>
-                            <View style={{flex: 2, alignItems: 'center'}}>
+                            <View style={{flex: 4, alignItems: 'center'}}>
                                 <Text style={{fontSize: 18}}>Welcome! Your device's id is</Text>
                                 <Text style={{fontSize: 24, fontWeight: 'bold'}}>{deviceInfo}</Text>
+                                <View style={{marginTop: 10}}>
+                                    <QRCode
+                                        value={deviceInfo}
+                                        size={200}
+                                        bgColor='black'
+                                        fgColor='white'/>
+                                </View>
                             </View>
                         </View>
                     </View>
