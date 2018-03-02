@@ -72,9 +72,9 @@ export default class Home extends Component {
                     isVisible={this.state.toggleViewDeviceInfo}
                     onBackdropPress={() => this.setState({toggleViewDeviceInfo: false})}>
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <View style={{backgroundColor: 'white', height: 400, width: 300, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}>
+                        <View style={{backgroundColor: 'white', height: 375, width: 300, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}>
                             <View style={{flex: 1, alignSelf: 'stretch', alignItems: 'flex-end', margin: 10}}><Icon name='close' size={25} onPress={() => this.setState({toggleViewDeviceInfo: false})} /></View>
-                            <View style={{flex: 4, alignItems: 'center'}}>
+                            <View style={{flex: 6, alignItems: 'center'}}>
                                 <Text style={{fontSize: 18}}>Welcome! Your device's id is</Text>
                                 <Text style={{fontSize: 24, fontWeight: 'bold'}}>{deviceInfo}</Text>
                                 <View style={{marginTop: 10}}>
