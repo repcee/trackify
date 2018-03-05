@@ -1,88 +1,52 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, Platform, View } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
-import UserService from './Services/UserService';
-import { StudentNavigator } from './Components/Student/StudentNavigator';
-import { ProfessorNavigator } from './Components/Professor/ProfessorNavigator';
-import FirstUse from './Components/FirstUse';
+import Dashboard from './Components/Dashboard';
+import Splash from './Components/Splash';
+import LoggedOutNavigator from './Components/LoggedOut/LoggedOutNavigator';
+import StudentNavigator from './Components/Student/StudentNavigator';
+import TeacherNavigator from './Components/Professor/ProfessorNavigator';
+
 
 export default class App extends Component {
-
-  constructor() {
-    super();
-    console.ignoredYellowBox = [
-      'Setting a timer',
-      'FIREBASE WARNING: Invalid query string segment:'
-    ];
-    this.state = {
-      firstName: '',
-      lastName: '',
-      isLoading: false,
-      error: '',
-      userType: '',
-      studentList: []
-    }
-  }
-
   componentWillMount() {
-    this.setState({isLoading: true});
-    const deviceId = DeviceInfo.getUniqueID();
-    // UserService.removeUserType();
-    UserService.getUserType().then(userType => {
-      console.log(userType);
-      if(userType) {
-        this.setState({isLoading: false});
-        this.setState({userType});
-      }
-      else {
-        UserService.getUserInfoFromDeviceId(deviceId)
-          .then(res => {
-            this.setState({userType: res.userType});
-            this.setState({isLoading: false});
-          })
-          .catch(err => {
-            console.log(err)
-            this.setState({isLoading: false});
-          });
-      }
+    // Check if user is logged in (with firebase)
+    this.setState({
+      isLoggedIn: false,
+      userType: 1,
+      endSplashScreen: false
     });
   }
-
-  linkDevice = (deviceId, firstName, lastName, userType) => {
-    UserService.updateDevice(deviceId, firstName, lastName, userType)
-      .then(res => {
-          this.setState({userType, firstName, lastName});
-          // UserService.setUserType(userType);
-      })
-      .catch(err => {
-        console.log('linkDevice() ' + err)
+  
+  componentDidMount() {
+    setTimeout( () => {
+      this.setState({
+        endSplashScreen: true
       });
+    },1500);
   }
   
-  _renderNavigator() {
-    return(
-      this.state.userType === 'student' ?
-        <StudentNavigator screenProps={
-          {
-            logout: () => this.logout(),
-            account: this.state.account,
-          }} />
-        :
-        <ProfessorNavigator screenProps={
-          {
-            login: (username, password) => this.login(username, password),
-            error: this.state.error
-          }} />
-    );
-  }
+  _navigateUser = () => {
+    const {isLoggedIn, userType} = this.state;
 
+    // User is a teacher
+    if (isLoggedIn && userType == 1) {
+      return <Dashboard />
+      
+    // User is a student
+    } else if (isLoggedIn && userType == 2) {
+      return <Dashboard />
+    }
+    
+    // User isn't logged in
+    return <LoggedOutNavigator />
+  }
+  
   render() {
-    return (
-      this.state.isLoading ?
-        <View style={{flex: 1, justifyContent: 'center'}}><ActivityIndicator size='large' color='#5386E4'/></View> :
-        this.state.userType ?
-          this._renderNavigator() :
-          <FirstUse linkDevice={(deviceId, firstName, lastName, userType) => this.linkDevice(deviceId, firstName, lastName, userType)}/>
-    );
+    if (!this.state.endSplashScreen) {
+      return <Splash />   
+    } else {
+      return this._navigateUser();
+    }
   }
 }
+
+

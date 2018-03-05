@@ -38,6 +38,11 @@ export const Styles = StyleSheet.create({
     backgroundColor: 'transparent',
     padding: Defaults.padding,
   },
+  centerContents: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   navbar: {
     flexDirection: 'row',
     justifyContent: 'space-between',

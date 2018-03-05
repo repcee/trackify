@@ -2,18 +2,13 @@ import React, { Component } from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { Styles } from '../config/AppTheme';
+import Constants from '../config/Constants'
 
-// You can import from local files
-// import AssetExample from './components/AssetExample';
-
-// or any pure javascript modules available in npm
-// import { Card } from 'react-native-elements'; // Version can ybe specified in package.json
-
+// Demonstrates the styles in the AppThemes
 export default class ThemeDemo extends Component {
   render() {
     return (
       <View style={[Styles.mainContainer]}>
-
         <View style={[Styles.navbar]}>
           <View style={[Styles.navbarLeft]}>
             <Icon name="arrow-left" type="font-awesome" />
