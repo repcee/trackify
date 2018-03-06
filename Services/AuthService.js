@@ -4,22 +4,11 @@ import Utils from '../config/Utils';
 /** 
  * Provides authentication services through firebase.
 */
-export default class AuthService {
-    // Holds reference to an instance of the firebase app.
-    _firebaseAppInstance = null;
-
-    // Holds reference to an instance of the firebase auth service.
-    _authInstance = null;
-
-    constructor() {
-        this._firebaseAppInstance = FirebaseApp;
-        this._authInstance = this._firebaseAppInstance.auth();
-    }
-    
+export default class AuthService {    
 
     // Returns an instance of the firebase auth service.
-    getAuthInstance = () => {
-        return this._authInstance;
+    static getAuthInstance() {
+        return FirebaseApp.auth();
     }
     
     
@@ -32,8 +21,8 @@ export default class AuthService {
      * @link https://firebase.google.com/docs/reference/js/firebase.auth.Auth#onAuthStateChanged
      * 
      */
-    notifyOnAuthStateChanged = (authCallback) => {
-        return this._authInstance.onAuthStateChanged((user) => {
+    static notifyOnAuthStateChanged (authCallback) {
+        return FirebaseApp.auth().onAuthStateChanged((user) => {
             authCallback(user);
         });
     }
@@ -43,9 +32,9 @@ export default class AuthService {
      * Returns a Promise to return a message about the sign in process.
      * The user object is not returned here, setup notifyOnAuthStateChanged first.
      */
-    signInUser = (email, password) => {
+    static signInUser (email, password) {
         return new Promise((resolve, reject) => {
-            this._authInstance.signInWithEmailAndPassword(email, password)
+            FirebaseApp.auth().signInWithEmailAndPassword(email, password)
             .then(() => {
                 resolve("Sign In was successful.");
             })
@@ -60,9 +49,9 @@ export default class AuthService {
      * Returns a Promise to return a message about the sign out process.
      * Will trigger notifyOnAuthStateChanged will a null parameter.
      */
-    signOutCurrentUser = () => {
+    static signOutCurrentUser() {
         return new Promise((resolve, reject) => {
-            this._authInstance.signOut()
+            FirebaseApp.auth().signOut()
             .then(() => {
                 resolve("Signed Out Successfully.");
             })

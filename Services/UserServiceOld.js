@@ -2,7 +2,7 @@
 import * as firebase from 'firebase';
 import { firebaseConfig } from '../env';
 
-export default class AuthServiceOld {
+export default class UserServiceOld {
 
     static getListOfUsers = () => {
         const firebaseApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
