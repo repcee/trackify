@@ -91,14 +91,14 @@ export const Styles = StyleSheet.create({
     height: 45,
     borderColor: 'transparent',
     borderWidth: 0,
-    borderRadius: 45 / 2,
+    borderRadius: (45/2),
   },
   btnSmall: {
     width: 150,
     height: 45,
     borderColor: 'transparent',
     borderWidth: 0,
-    borderRadius: 45 / 2,
+    borderRadius: (45/2),
   },
   btnPrimary: {
     backgroundColor: Colors.primary,
