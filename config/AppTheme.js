@@ -3,13 +3,18 @@ import { StyleSheet } from 'react-native';
 
 // Constants that are used for styling the app.
 export const Colors = {
-  primary: '#2962FF',
-  primaryDark: '#0D47A1',
-  accent: '#FFD600',
-  positive: '#00C853',
-  warning: '#FF6D00',
+  primary: '#9ECDFF',
+  primaryDark: '#4990E2',
+  accent: '#A3A8F8',
+  positive: '#00ca9d',
+  warning: '#f5a622',
   negative: '#D50000',
+  black: '#35343d',
   muted: '#b1b1b1',
+  textColorRegular: '#8B95A3',
+  textColorHeading: '#6E7B8C',
+  textColorSubHeading: '#6E7B8C',
+  headerTextIcons: '#6E7B8C'
 };
 
 export const Defaults = {
@@ -19,10 +24,7 @@ export const Defaults = {
   paddingSmall: 10,
   fontFamilyRegular: 'OpenSans-Regular',
   fontFamilyLight: 'OpenSans-Light',
-  textSize: 16,
-  textColorRegular: '#636363',
-  textColorHeading: '#4e4e4e',
-  textColorSubHeading: '#3e3e3e',
+  textSize: 16
 };
 
 export const Styles = StyleSheet.create({
@@ -30,7 +32,7 @@ export const Styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     // paddingTop: Constants.statusBarHeight,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#F5F7FA',
   },
   // Typically used to hold content in the content area of the page.
   container: {
@@ -47,7 +49,7 @@ export const Styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     height: 60,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#F5F7FA',
     elevation: 2
   },
   navbarLeft: {
@@ -66,7 +68,7 @@ export const Styles = StyleSheet.create({
   },
 
   pageTitle: {
-    color: '#000000',
+    color: Colors.headerTextIcons,
     fontFamily: Defaults.fontFamilyRegular,
     fontSize: Defaults.textSize + 3,
     paddingLeft: Defaults.padding,
@@ -116,17 +118,20 @@ export const Styles = StyleSheet.create({
     backgroundColor: Colors.negative,
   },
   btnBlack: {
+    backgroundColor: Colors.black,
+  },
+  btnBlackReal: {
     backgroundColor: '#000000',
   },
   // Untility Styles
   textRegular: {
-    color: Defaults.textColorRegular,
+    color: Colors.textColorRegular,
     fontFamily: Defaults.fontFamilyRegular,
     fontSize: Defaults.textSize,
     lineHeight: 30,
   },
   textHeading: {
-    color: Defaults.textColorHeading,
+    color: Colors.textColorHeading,
     fontFamily: Defaults.fontFamilyRegular,
     fontSize: Defaults.textSize + 5,
     fontWeight: 'bold',
@@ -134,7 +139,7 @@ export const Styles = StyleSheet.create({
     marginBottom: Defaults.margin,
   },
   textSubHeading: {
-    color: Defaults.textColorSubHeading,
+    color: Colors.textColorSubHeading,
     fontFamily: Defaults.fontFamilyRegular,
     fontSize: Defaults.textSize,
     fontWeight: 'bold',
@@ -145,6 +150,9 @@ export const Styles = StyleSheet.create({
     color: '#ffffff',
   },
   textColorBlack: {
+    color: Colors.black,
+  },
+  textColorBlackReal: {
     color: '#000000',
   },
   textColorPrimary: {
