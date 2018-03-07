@@ -8,19 +8,22 @@ export const Colors = {
   accent: '#A3A8F8',
   positive: '#00ca9d',
   warning: '#f5a622',
-  negative: '#D50000',
+  negative: '#e44343',
   black: '#35343d',
   muted: '#b1b1b1',
   textColorRegular: '#8B95A3',
   textColorHeading: '#6E7B8C',
   textColorSubHeading: '#6E7B8C',
-  headerTextIcons: '#6E7B8C'
+  headerTextIcons: '#6E7B8C',
+  inputUnderlineColor: '#d8d8d8'
 };
 
 export const Defaults = {
   margin: 20,
   marginSmall: 10,
+  marginLarge: 20,
   padding: 20,
+  containerPadding: 40,
   paddingSmall: 10,
   fontFamilyRegular: 'OpenSans-Regular',
   fontFamilyLight: 'OpenSans-Light',
@@ -38,37 +41,55 @@ export const Styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
-    padding: Defaults.padding,
+    padding: Defaults.containerPadding,
+    // padding: Defaults.padding
   },
+  // Center on both axises
   centerContents: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center'
   },
+
+  centerContentsCrossAxis: {
+    flex: 1,
+    alignItems: 'center'
+  },
+
+  centerContentsMainAxis: {
+    flex: 1,
+    justifyContent: 'center'
+  },
+
   navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     height: 60,
     backgroundColor: '#F5F7FA',
-    elevation: 2
+    borderColor: '#eeeeee',
+    borderWidth: 3
   },
   navbarLeft: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
     paddingLeft: Defaults.padding,
     paddingRight: Defaults.padding,
     backgroundColor: 'transparent'
   },
   navbarRight: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-end',
     paddingLeft: Defaults.padding,
     paddingRight: Defaults.padding,
     backgroundColor: 'transparent'
   },
 
   pageTitle: {
-    color: Colors.headerTextIcons,
+    color: Colors.primaryDark,
     fontFamily: Defaults.fontFamilyRegular,
     fontSize: Defaults.textSize + 3,
     paddingLeft: Defaults.padding,
@@ -124,6 +145,9 @@ export const Styles = StyleSheet.create({
     backgroundColor: '#000000',
   },
   // Untility Styles
+  centerText: {
+    textAlign: 'center'
+  },
   textRegular: {
     color: Colors.textColorRegular,
     fontFamily: Defaults.fontFamilyRegular,
@@ -146,6 +170,11 @@ export const Styles = StyleSheet.create({
     marginTop: Defaults.margin,
     marginBottom: Defaults.margin,
   },
+  textErrorMessage: {
+    fontWeight: 'bold',
+    color: Colors.negative,
+    textAlign: 'center'
+  },
   textColorWhite: {
     color: '#ffffff',
   },
@@ -158,8 +187,20 @@ export const Styles = StyleSheet.create({
   textColorPrimary: {
     color: Colors.primary,
   },
+  textColorPrimaryDark: {
+    color: Colors.primaryDark,
+  },
   textColorAccent: {
     color: Colors.accent,
+  },
+  textColorPositive: {
+    color: Colors.positive,
+  },
+  textColorWarning: {
+    color: Colors.warning,
+  },
+  textColorNegative: {
+    color: Colors.negative,
   },
   textColorMuted: {
     color: Colors.muted,
@@ -195,4 +236,26 @@ export const Styles = StyleSheet.create({
   marginLSmall: {
     marginLeft: Defaults.marginSmall,
   },
+  marginTLarge: {
+    marginTop: Defaults.marginLarge,
+  },
+  marginRLarge: {
+    marginRight: Defaults.marginLarge,
+  },
+  marginBLarge: {
+    marginBottom: Defaults.marginLarge,
+  },
+  marginLLarge: {
+    marginLeft: Defaults.marginLarge,
+  },
+
+  // Input Styles
+  inputField: {
+    height: 70, 
+    fontSize: Defaults.textSize,
+    color: Colors.textColorRegular,
+    fontFamily: Defaults.fontFamilyRegular,
+    width: '100%',
+    padding: 20
+  }
 });

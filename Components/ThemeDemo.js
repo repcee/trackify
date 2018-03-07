@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
-import { Styles } from '../config/AppTheme';
+import { Styles, Colors } from '../config/AppTheme';
 import Constants from '../config/Constants'
 
 // Demonstrates the styles in the AppThemes
@@ -11,13 +11,13 @@ export default class ThemeDemo extends Component {
       <View style={[Styles.mainContainer]}>
         <View style={[Styles.navbar]}>
           <View style={[Styles.navbarLeft]}>
-            <Icon name="arrow-left" type="font-awesome" />
+            <Icon name="arrow-left" type="font-awesome" color={Colors.headerTextIcons} />
           </View>
 
           <Text style={[Styles.pageTitle]}>Dashboard</Text>
 
           <View style={[Styles.navbarRight]}>
-            <Icon name="cog" type="font-awesome" />
+            <Icon name="cog" type="font-awesome" color={Colors.headerTextIcons} />
           </View>
 
         </View>
