@@ -4,14 +4,14 @@ import Utils from '../config/Utils';
 /** 
  * Provides authentication services through firebase.
 */
-export default class AuthService {    
+export default class AuthService {
 
     // Returns an instance of the firebase auth service.
     static getAuthInstance() {
         return FirebaseApp.auth();
     }
-    
-    
+
+
     /**
      * Use this method on all pages that need information
      * about the current (signed-in) user
@@ -21,7 +21,7 @@ export default class AuthService {
      * @link https://firebase.google.com/docs/reference/js/firebase.auth.Auth#onAuthStateChanged
      * 
      */
-    static notifyOnAuthStateChanged (authCallback) {
+    static notifyOnAuthStateChanged(authCallback) {
         return FirebaseApp.auth().onAuthStateChanged((user) => {
             authCallback(user);
         });
@@ -32,16 +32,24 @@ export default class AuthService {
      * Returns a Promise to return a message about the sign in process.
      * The user object is not returned here, setup notifyOnAuthStateChanged first.
      */
-    static signInUser (email, password) {
+    static signInUser(email, password) {
         return new Promise((resolve, reject) => {
             FirebaseApp.auth().signInWithEmailAndPassword(email, password)
-            .then(() => {
-                resolve("Sign In was successful.");
-            })
             .catch( (error) => {
-                reject(error.message);
+                console.log("si: ", Utils.formatFirebaseMessage(error.message));
+                reject(Utils.formatFirebaseMessage(error.message));
             });
         });
+
+        // return FirebaseApp.auth().signInWithEmailAndPassword(email, password)
+        //     .then((ss) => {
+        //         console.log("res")
+        //         // resolve(ss);
+        //     })
+        //     .catch((error) => {
+        //         console.log("rej: ", Utils.formatFirebaseMessage(error.message));
+        //         // reject(Utils.formatFirebaseMessage(error.message));
+        // });
     }
 
     /**
@@ -52,12 +60,12 @@ export default class AuthService {
     static signOutCurrentUser() {
         return new Promise((resolve, reject) => {
             FirebaseApp.auth().signOut()
-            .then(() => {
-                resolve("Signed Out Successfully.");
-            })
-            .catch( (error) => {
-                reject(error.message);
-            });
+                .then(() => {
+                    resolve("Signed Out Successfully.");
+                })
+                .catch((error) => {
+                    reject(error.message);
+                });
         });
     }
 }

@@ -7,7 +7,7 @@
 import { StackNavigator } from 'react-navigation';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
-
+import UserTypePrompt from './UserTypePrompt';
 
 const routeConfigs = {
   SignUpScreen: {
@@ -22,11 +22,18 @@ const routeConfigs = {
     navigationOptions: {
       header: null
     }
+  },
+
+  UserTypePromptScreen: {
+    screen: UserTypePrompt,
+    navigationOptions: {
+      header: null
+    }
   }
 };
 
 const navigatorConfigs = {
-    initialRouteName: 'SignInScreen'
+    initialRouteName: 'UserTypePromptScreen'
 };
 
 const LoggedOutNavigator = StackNavigator(routeConfigs, navigatorConfigs);
