@@ -29,16 +29,6 @@ export default class SignIn extends Component {
         };
     }
 
-    _s = (us) => {
-        if (us) {
-            this.setState({
-                currentUser: us.uid
-            });
-        } else {
-            alert("Goodbye. You signed out.");
-        }
-    }
-
     handleBackButtonClick = () => {
         this.props.navigation.dispatch(
             NavigationActions.back({
@@ -49,7 +39,8 @@ export default class SignIn extends Component {
 
     handleSignInClick = () => {
         this.setState({
-            isLoading: true
+            isLoading: true,
+            errorMessage: null
         });
         inputEmail = this.state.inputEmail;
         inputPassword = this.state.inputPassword;
