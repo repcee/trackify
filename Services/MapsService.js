@@ -4,11 +4,11 @@ import { googleMaps } from '../env';
  * Contains methods to interract with Google Maps API.
  */
 
-export default class MapsServic {
+export default class MapsService {
     static __mapsApiBaseUrlParts = 'https://maps.googleapis.com/maps/api/';
 
-    static async getLatLongFromAddress(street, city, zip) {
-        const fetchUrl = this.__mapsApiBaseUrlParts + `geocode/json?address=${street},${city},${zip}`
+    static async getLatLongFromAddress(street, city, state, zip) {
+        const fetchUrl = this.__mapsApiBaseUrlParts + `geocode/json?address=${street},${city},${state},${zip}`
             + `&key=${googleMaps.apiKey}`;
 
         try {
