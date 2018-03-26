@@ -8,6 +8,8 @@ import { StackNavigator } from 'react-navigation';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
 import UserTypePrompt from './UserTypePrompt';
+import Home from '../Professor/Home';
+import ProfessorNavigator from '../Professor/ProfessorNavigator';
 
 const routeConfigs = {
   SignUpScreen: {
