@@ -5,6 +5,7 @@ import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
 import { NavigationActions } from 'react-navigation';
 import moment from 'moment';
+import ClassService from '../../Services/ClassService';
 
 import { Styles, Colors } from '../../config/AppTheme';
 import { NormalText, SubHeadingText, PrimaryDarkButton, AccentButton, NormalInput } from '../UtilComponents';
@@ -12,28 +13,61 @@ import { NormalText, SubHeadingText, PrimaryDarkButton, AccentButton, NormalInpu
 
 
 export default class AddEditClass extends Component {
+    authStateListenerUnsubscriber = null;
+
     constructor(props) {
         super(props);
         this.state = {
             className: null,
-            classDesciption: null,
-            schoolname: null,
+            description: null,
+            schoolName: null,
 
-            schAddrStr: null,
-            schAddrLine1: null,
-            schAddrCity: null,
-            schAddrState: null,
-            schAddrZip: null,
-            schAddrLat: 33.7531,
-            schAddrLng:  84.3853,
+            // Not used right now.
+            addressLine1: null,
+            addressCity: null,
+            addressState: null,
+            addressZip: null,
 
-            classStartDate: null,
-            classEndDate: null,
-            classMeetingStart: null,
-            classMeetingEnd: null,
-            classMeetingDays: Array(7).fill(false),
+            // These addess details are being used now.
+            classAddressString: null,
+            classLatitude: 33.7531,
+            classLongitude:  84.3853,
+
+            timezone: 'EST',
+
+            startDate: null,
+            endDate: null,
+            startTime: null,
+            endTime: null,
+            meetingDays: Array(7).fill(false),
+
+            checkInGracePeriodMinutes: 5,
+            allowedAttendanceRadiusMiles: 1,
+            createdAt: null,
+            updatedAt: null,
+
+            teacherId: null,
+
+            // Other state
+            submitDisabled: false,
 
         };
+    }
+
+    componentWillMount() {
+        authStateListenerUnsubscriber = AuthService.notifyOnAuthStateChanged((user) => {
+            if (user) {
+                this.setState({
+                    teacherId: user.uid
+                });
+            } else {
+                console.log("auth: no user.")
+            }
+        });
+    }
+
+    componentWillUnmount() {
+        authStateListenerUnsubscriber();
     }
 
     _handleBackButtonClick = () => {
@@ -46,16 +80,6 @@ export default class AddEditClass extends Component {
 
 
     _handleSchoolLocationClicked = () => {
-        const _currentAddress = {
-            schAddrStr,
-            schAddrLine1,
-            schAddrCity,
-            schAddrState,
-            schAddrZip,
-            schAddrLat,
-            schAddrLng
-        } = this.state;
-
         this.props.navigation.navigate('SchoolLocation', {appState: Object.assign({}, this.state),
             returnData: this._schoolLocationReturnData.bind(this)
         });
@@ -63,13 +87,9 @@ export default class AddEditClass extends Component {
 
     _schoolLocationReturnData = (returnData) => {   
         this.setState({
-            schAddrStr,
-            schAddrLine1,
-            schAddrCity,
-            schAddrState,
-            schAddrZip,
-            schAddrLat,
-            schAddrLng
+            classAddressString,
+            classLatitude,
+            classLongitude
         } = returnData);
 
     }
@@ -82,15 +102,14 @@ export default class AddEditClass extends Component {
 
             if (action !== DatePickerAndroid.dismissedAction) {
                 const _date = moment(new Date(year, month, day)).format('LL'); 
-                console.log(_date);
 
                 if (whatField == 1) {
                     this.setState({
-                        classStartDate: _date
+                        startDate: _date
                     });
                 } else if (whatField == 2) {
                     this.setState({
-                        classEndDate: _date
+                        endDate: _date
                     });
                 }
             }
@@ -105,8 +124,6 @@ export default class AddEditClass extends Component {
             // Need to convert the time to 24-hour time for the picker
            const displayTime = moment(currentTime || '00:00', ['HH:mm', 'hh:mm A']);
 
-           console.log(displayTime.hour(), displayTime.minutes());
-
             const { action, hour, minute } = await TimePickerAndroid.open({
                 hour: displayTime.hour(),
                 minute: displayTime.minutes(),
@@ -118,11 +135,11 @@ export default class AddEditClass extends Component {
 
                 if (whatField == 1) {
                     this.setState({
-                        classMeetingStart: _timeStr
+                        startTime: _timeStr
                     });
                 } else if (whatField == 2) {
                     this.setState({
-                        classMeetingEnd: _timeStr
+                        endTime: _timeStr
                     });
                 }
             }
@@ -132,17 +149,49 @@ export default class AddEditClass extends Component {
     }
 
     _handleDaysCheckboxClicked = (which) => {
-        let days = this.state.classMeetingDays.slice();
-        days[which] = !this.state.classMeetingDays[which];
-        console.log(days)
+        let days = this.state.meetingDays.slice();
+        days[which] = !this.state.meetingDays[which];
         this.setState({
-            classMeetingDays: days
+            meetingDays: days
         });
     }
 
     _handleOnFormSubmit = () => {
-        alert("Submitting");
-       
+        this.setState({
+            submitDisabled: true
+        });
+
+        const { submitDisabled, ...classData } = this.state;
+        classData.createdAt = classData.updatedAt = Date.now();
+
+        ClassService.addClass(classData).then((res) => {
+            this.props.navigation.dispatch(
+                NavigationActions.back({
+                    key: null
+                })
+            );
+        }).catch((err) => {
+            console.log(err);
+            alert("An error occurred.");
+        });
+    }
+
+    _handleschoolNameInputChanged = (text) => {
+        this.setState({
+            schoolName: text
+        });
+    }
+
+    _handleClassNameInputChanged = (text) => {
+        this.setState({
+            className: text
+        });
+    }
+
+    _handleClassDescriptionInputChanged = (text) => {
+        this.setState({
+            description: text
+        });
     }
 
 
@@ -168,20 +217,21 @@ export default class AddEditClass extends Component {
                             <NormalText style={[Styles.textBold, Styles.marginB]}>Enter the details about the class below.</NormalText>
                             
                             <View style={[Styles.marginB]}>
-                                <NormalText>Name:</NormalText>
-                                <NormalInput value={this.state.className} />
+                                <NormalText>Class Name:</NormalText>
+                                <NormalInput value={this.state.className} editable={!this.state.submitDisabled}
+                                onChangeText={(text) => this._handleClassNameInputChanged(text)}/>
                             </View>
 
                             <View  style={[Styles.marginB]}>
                                 <NormalText>Description (optional):</NormalText>
-                                <TouchableOpacity onPress={() => {this._handleDatePickerClicked(2)}}>
-                                    <NormalInput value={this.state.classDesciption} />
-                                    </TouchableOpacity>
+                                <NormalInput value={this.state.description} editable={!this.state.submitDisabled}
+                                     onChangeText={(text) => this._handleClassDescriptionInputChanged(text)} />
                             </View>
 
                             <View  style={[Styles.marginB]}>
                                 <NormalText>School name:</NormalText>
-                                <NormalInput value={this.state.schoolname} />
+                                <NormalInput value={this.state.schoolName} editable={!this.state.submitDisabled}
+                                onChangeText={(text) => this._handleschoolNameInputChanged(text)} />
                             </View>
 
                             <View style={[Styles.marginB]}>
@@ -189,16 +239,17 @@ export default class AddEditClass extends Component {
                                 <View style={[{ flexDirection: 'row', justifyContent: 'flex-start' }]}>
                                     <View style={[{ flex: 1 }]}>
                                         <Icon
+                                            disabled={this.state.submitDisabled}
                                             raised
                                             reverse
                                             name='map'
                                             type='font-awesome'
-                                            color={this.state.schAddrStr ? Colors.positive: Colors.negative}
+                                            color={this.state.classAddressString ? Colors.positive: Colors.negative}
                                             onPress={() => { this._handleSchoolLocationClicked() }} />
                                     </View>
 
                                     <View style={[{ flex: 3 }]}>
-                                        <NormalText>{this.state.schAddrStr}</NormalText>
+                                        <NormalText>{this.state.classAddressString}</NormalText>
                                     </View>
                                 </View>
  
@@ -210,15 +261,17 @@ export default class AddEditClass extends Component {
                                 <View style={[{ flexDirection: 'row', justifyContent: 'flex-start' }]}>
                                     <View style={[{ flex: 1 }]}>
                                         <NormalText>Start Date:</NormalText>
-                                        <TouchableOpacity onPress={() => { this._handleDatePickerClicked(1, this.state.classStartDate) }}>
-                                            <NormalInput editable={false} value={this.state.classStartDate} />
+                                        <TouchableOpacity onPress={() => { this._handleDatePickerClicked(1, this.state.startDate)}}
+                                            disabled={this.state.submitDisabled} >
+                                            <NormalInput editable={false} value={this.state.startDate} />
                                         </TouchableOpacity>
                                     </View>
 
                                     <View style={[{ flex: 1 }]}>
                                         <NormalText>End Date:</NormalText>
-                                        <TouchableOpacity onPress={() => { this._handleDatePickerClicked(2, this.state.classEndDate) }}>
-                                            <NormalInput editable={false} value={this.state.classEndDate} />
+                                        <TouchableOpacity onPress={() => { this._handleDatePickerClicked(2, this.state.endDate)}} 
+                                            disabled={this.state.submitDisabled} >
+                                            <NormalInput editable={false} value={this.state.endDate} />
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -230,15 +283,17 @@ export default class AddEditClass extends Component {
                                 <View style={[{ flexDirection: 'row', justifyContent: 'flex-start' }]}>
                                     <View style={[{ flex: 1 }]}>
                                         <NormalText>Start Time:</NormalText>
-                                        <TouchableOpacity onPress={() => { this._handleTImePickerClicked(1, this.state.classMeetingStart) }}>
-                                            <NormalInput editable={false} value={this.state.classMeetingStart} />
+                                        <TouchableOpacity onPress={() => { this._handleTImePickerClicked(1, this.state.startTime)}} 
+                                            disabled={this.state.submitDisabled} >
+                                            <NormalInput editable={false} value={this.state.startTime} />
                                         </TouchableOpacity>
                                     </View>
 
                                     <View style={[{ flex: 1 }]}>
                                         <NormalText>End Time:</NormalText>
-                                        <TouchableOpacity onPress={() => { this._handleTImePickerClicked(2, this.state.classMeetingEnd) }}>
-                                            <NormalInput editable={false} value={this.state.classMeetingEnd} />
+                                        <TouchableOpacity onPress={() => { this._handleTImePickerClicked(2, this.state.endTime)}} 
+                                            disabled={this.state.submitDisabled} >
+                                            <NormalInput editable={false} value={this.state.endTime} />
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -250,32 +305,32 @@ export default class AddEditClass extends Component {
                                 <View style={[{ flexDirection: 'row', justifyContent: 'flex-start' }]}>
                                     <View style={[{ flex: 1 }]}>
                                         <CheckBox onPress={() => {this._handleDaysCheckboxClicked(0)}}
-                                            title='Sunday' checked={this.state.classMeetingDays[0]}
+                                            title='Sunday' checked={this.state.meetingDays[0]} disabled={this.state.submitDisabled}
                                         />
                                         <CheckBox onPress={() => {this._handleDaysCheckboxClicked(1)}}
-                                            title='Monday' checked={this.state.classMeetingDays[1]}
+                                            title='Monday' checked={this.state.meetingDays[1]} disabled={this.state.submitDisabled}
                                         />
                                         <CheckBox onPress={() => {this._handleDaysCheckboxClicked(2)}}
-                                            title='Tuesday' checked={this.state.classMeetingDays[2]}
+                                            title='Tuesday' checked={this.state.meetingDays[2]} disabled={this.state.submitDisabled}
                                         />
                                         <CheckBox onPress={() => {this._handleDaysCheckboxClicked(3)}}
-                                            title='Wednesday' checked={this.state.classMeetingDays[3]}
+                                            title='Wednesday' checked={this.state.meetingDays[3]} disabled={this.state.submitDisabled}
                                         />
                                         <CheckBox onPress={() => {this._handleDaysCheckboxClicked(4)}}
-                                            title='Thursday' checked={this.state.classMeetingDays[4]}
+                                            title='Thursday' checked={this.state.meetingDays[4]} disabled={this.state.submitDisabled}
                                         />
                                         <CheckBox onPress={() => {this._handleDaysCheckboxClicked(5)}}
-                                            title='Friday' checked={this.state.classMeetingDays[5]}
+                                            title='Friday' checked={this.state.meetingDays[5]} disabled={this.state.submitDisabled}
                                         />
                                         <CheckBox onPress={() => {this._handleDaysCheckboxClicked(6)}}
-                                            title='Saturday' checked={this.state.classMeetingDays[6]}
+                                            title='Saturday' checked={this.state.meetingDays[6]} disabled={this.state.submitDisabled}
                                         />
                                     </View>
                                 </View>
                             </View>
 
                             <View style={[Styles.marginT]}>
-                                <PrimaryDarkButton disabled={true} text="Submit" onPress={() => { this._handleOnFormSubmit() }} />
+                                <PrimaryDarkButton disabled={this.state.submitDisabled} text="Submit" onPress={() => { this._handleOnFormSubmit() }} />
                             </View>
                         </KeyboardAvoidingView>
                     </View>

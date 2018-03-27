@@ -19,23 +19,23 @@ export default class SchoolLocation extends Component {
     constructor(props) {        
         super(props);
         const appState = {
-            schAddrStr,
-            schAddrLat,
-            schAddrLng
+            classAddressString,
+            classLatitude,
+            classLongitude
         } = this.props.navigation.getParam('appState');
 
-        console.log("------AppStae:", appState);
+        
 
         // Set the initial state of the screen.
         this.state = {
             changeAddressModalVisible: false,
 
             // Validated address from google's api
-            validatedAddressString: appState.schAddrStr,
+            classAddressString: appState.classAddressString,
 
             // TODO: Update to get the current lat and lng from user location
-            schAddrLat: appState.schAddrLat,
-            schAddrLng:  appState.schAddrLng,
+            classLatitude: appState.classLatitude,
+            classLongitude:  appState.classLongitude,
 
             //Input address info
             inputAddrLine1: null,
@@ -46,7 +46,6 @@ export default class SchoolLocation extends Component {
             isFetchingAddr: false,
 
         };
-        console.log(this.props.navigation.getParam('appState'));
     }
 
 
@@ -144,23 +143,18 @@ export default class SchoolLocation extends Component {
                     alert('Address not found. Try again.');
                 } else {
                     this.setState({
-                        addrLat: res[0].geometry.location.lat,
-                        addrLng: res[0].geometry.location.lng,
-                        validatedAddressString: res[0].formatted_address,
-
-                        addrLine1: this.state.inputAddrLine1,
-                        addrCity: this.state.inputAddrCity,
-                        addrState: this.state.inputAddrState,
-                        addrZip: this.state.inputAddrZip,
+                        classLatitude: res[0].geometry.location.lat,
+                        classLongitude: res[0].geometry.location.lng,
+                        classAddressString: res[0].formatted_address,
 
                         changeAddressModalVisible: false,
                     });
 
                     // update return address
                     const _returnData = {
-                        schAddrStr: res[0].formatted_address,
-                        schAddrLat: res[0].geometry.location.lat,
-                        schAddrLng:  res[0].geometry.location.lng,
+                        classAddressString: res[0].formatted_address,
+                        classLatitude: res[0].geometry.location.lat,
+                        classLongitude:  res[0].geometry.location.lng,
                     };
 
 
@@ -173,13 +167,13 @@ export default class SchoolLocation extends Component {
     }
 
     _renderAddressInfo = () => {
-        if (this.state.validatedAddressString) {
+        if (this.state.classAddressString) {
             return (
                 <View style={[{flex:2, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between'}]}>
                     <View style={[{ flex: 1 }]}>
                         <NormalText style={Styles.textBold}>Address:</NormalText>
                         <NormalText>
-                            {this.state.validatedAddressString}
+                            {this.state.classAddressString}
                         </NormalText>
                     </View>
                     <View style={[{ flex: 1, alignItems: 'flex-end' }]}>
@@ -241,19 +235,19 @@ export default class SchoolLocation extends Component {
                             scrollEnabled={false} zoomEnabled={false} style={mapStyles.map}
                             provider={PROVIDER_GOOGLE}
                             region={{
-                                latitude: this.state.schAddrLat,
-                                longitude: this.state.schAddrLng,
+                                latitude: this.state.classLatitude,
+                                longitude: this.state.classLongitude,
                                 latitudeDelta: 0.005,
                                 longitudeDelta: 0.005,
                             }}>
                             
                             <MapView.Marker draggable
                                 coordinate={{
-                                    latitude: this.state.schAddrLat,
-                                    longitude: this.state.schAddrLng,
+                                    latitude: this.state.classLatitude,
+                                    longitude: this.state.classLongitude,
                                 }}
                                 title={"Class Location"}
-                                description={this.state.validatedAddressString}
+                                description={this.state.classAddressString}
                             />
                         </MapView>
                     </View>
@@ -286,7 +280,7 @@ export default class SchoolLocation extends Component {
                         }
                        
                         <View>
-                            <AccentButton text={this.state.validatedAddressString ? "Update" : "Add"} onPress={() => { this._handleSubmitAddressChange() }} />
+                            <AccentButton text={this.state.classAddressString ? "Update" : "Add"} onPress={() => { this._handleSubmitAddressChange() }} />
                             <BlackButton style={[Styles.marginT]} text="Cancel" onPress={() => {this._handleCancelAddressChange()}}/>
                         </View>
                     </View>

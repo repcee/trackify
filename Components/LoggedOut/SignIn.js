@@ -62,7 +62,7 @@ export default class SignIn extends Component {
             });
     }
 
-    // Todo: redirect user to dashboard when authsate changes.
+    // Todo: redirect user to dashboard when authstate changes.
     componentWillMount() {
         authStateListenerUnsubscriber = AuthService.notifyOnAuthStateChanged((user) => {
             if (user) {
