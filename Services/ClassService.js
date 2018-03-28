@@ -14,10 +14,11 @@ export default class ClassService {
         return FirebaseApp.database().ref(`/classes/${classId}`);
     }
 
-    static async getClass(classId) {
+    static getClass(classId, callback) {
         const classRef = this.getReferenceToClass(classId);
-        return await classRef.on('value', (dataSnap) => {
-            return  dataSnap.val();
+        
+        return classRef.on('value', (dataSnap) => {
+            callback(dataSnap.val());
         });
     }
 

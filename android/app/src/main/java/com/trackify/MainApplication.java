@@ -1,7 +1,6 @@
 package com.trackify;
 
 import android.app.Application;
-
 import com.facebook.react.ReactApplication;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
