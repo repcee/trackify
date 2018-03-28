@@ -25,6 +25,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new TrackifyPackageManager(),
             new MapsPackage(),
             new RNDeviceInfo(),
             new VectorIconsPackage()
