@@ -7,6 +7,7 @@ import { NavigationActions } from 'react-navigation';
 import { Styles, Colors } from '../../config/AppTheme';
 import { NormalText, SubHeadingText, PrimaryDarkButton, AccentButton } from '../UtilComponents';
 import ClassService from '../../Services/ClassService';
+import LinkStudentQRScanner from './LinkStudentQRScanner';
 
 
 export default class ClassDetails extends Component {
@@ -23,7 +24,8 @@ export default class ClassDetails extends Component {
             classData: null,
 
             // others
-            isLoading: true
+            isLoading: true,
+            testDeviceId: null
         };
     }
 
@@ -51,16 +53,38 @@ export default class ClassDetails extends Component {
         });
     }
 
-    _handleUnlinkedStudentClicked = (unlinedStudentIndex) => {
-        this.props.navigation.navigate('LinkStudentByQRCode', {
-            classId: this.state.classId, 
-            className: this.state.className,
-            unlinkedIndex: unlinedStudentIndex,
-            studentName: this.state.unlinkedStudents[unlinedStudentIndex]
-        });
+    _handleUnlinkedStudentClicked = async (unlinedStudentIndex) => {
+        // this.props.navigation.navigate('LinkStudentByQRCode', {
+        //     classId: this.state.classId, 
+        //     className: this.state.className,
+        //     unlinkedIndex: unlinedStudentIndex,
+        //     studentName: this.state.unlinkedStudents[unlinedStudentIndex]
+        // });
+
+        try {
+            const deviceId = await LinkStudentQRScanner.scanQRCode();
+            console.log("Did: ", deviceId);
+            this.setState({
+                testDeviceId: deviceId
+            });
+            alert("Device id: " + deviceId);
+        } catch(err) {
+            console.log(err);
+            alert("An error occurred.");
+        }         
     }
 
-    _handleEditButtonClicked = () => {
+    _onScanDeviceIdSuccess = (deviceId) => {
+        console.log(deviceId);
+        alert("Device Id is: " + deviceId);
+    }
+
+    _onScanDeviceIdError = () => {
+        console.log("Scan error: ", err);
+        alert("An error occurred.");
+    }
+
+    _handleEditButtonClicked = (err) => {
         alert("To be implemented.");
     }
 
@@ -125,6 +149,8 @@ export default class ClassDetails extends Component {
                 <View style={[Styles.marT]}>                
                     <SubHeadingText style={[Styles.textBold]}>Unlinked Students</SubHeadingText>
                     {this._renderUnLinkedStudents()}
+
+                    <NormalText>{this.state.testDeviceId}</NormalText>
                 </View>
 
                 <View style={[Styles.marginTLarge]}>                

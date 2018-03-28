@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Home from './Home';
 import Settings from './Settings';
 import SchoolLocation from './SchoolLocation';
-import LinkStudentByQRCode from './LinkStudentByQRCode';
+// import LinkStudentQRScanner from './LinkStudentQRScanner';
 import ClassDetails from './ClassDetails';
 import AddEditClass from './AddEditClass';
 import { StackNavigator } from 'react-navigation';
@@ -71,12 +71,12 @@ const Dashboard = TabNavigator({
 		  }
 		},
 
-		LinkStudentByQRCode: {
-		  screen: LinkStudentByQRCode,
-		  navigationOptions: {
-			header: null
-		  }
-		},
+		// LinkStudentByQRCode: {
+		//   screen: LinkStudentByQRCode,
+		//   navigationOptions: {
+		// 	header: null
+		//   }
+		// },
 	  
 		SchoolLocation: {
 		  screen: SchoolLocation,
