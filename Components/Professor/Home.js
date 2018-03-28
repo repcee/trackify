@@ -7,39 +7,6 @@ import UserService from '../../Services/UserService';
 import { Styles, Colors } from '../../config/AppTheme';
 import { NormalText, SubHeadingText, PrimaryDarkButton, AccentButton } from '../UtilComponents';
 
-const classes = [
-    {
-        name: "Math Modes For CS"
-    },
-    {
-        name: "English Composition II"
-    },
-    {
-        name: "English Composition II"
-    },
-    {
-        name: "English Composition II"
-    },
-    {
-        name: "English Composition II"
-    },
-    {
-        name: "English Composition II"
-    },
-    {
-        name: "English Composition II"
-    },
-    {
-        name: "English Composition II"
-    },
-    {
-        name: "English Composition II"
-    },
-    {
-        name: "English Composition II"
-    },
-];
-
 styles = StyleSheet.create({
     subtitleView: {
       flexDirection: 'row',
@@ -64,7 +31,7 @@ export default class Home extends Component {
 
         this.state = {
             user: null,
-            classes: []
+            classes: null
         }
 
     }
@@ -79,15 +46,10 @@ export default class Home extends Component {
                 UserService.getReferenceToUser(user.uid).child('/classesOwned').orderByChild('updatedAt').on('value', (snap) => {
                   
                     this.setState({
-                        classes: Object.values(snap.val())
+                        classes: snap.val() ? Object.values(snap.val()).reverse() : null
                     });
                  
                 });
-                // UserService.getUserData(user.uid).then((snap) => {
-                //     console.log(snap.classesOwned);
-                // }).catch((err) => {
-                //     alert("An error occurred while fetching your classes.");
-                // });
             } else {
                 console.log("auth: no user.")
             }
@@ -100,6 +62,34 @@ export default class Home extends Component {
 
     _handleAddClassClick = () => {
         this.props.navigation.navigate('AddEditClass');
+    }
+
+    _handleClassListItemClicked = (classData) => {
+        this.props.navigation.navigate('ClassDetails', {classData: classData});
+        // alert("heading to " + classData.classId);
+    }
+
+    _renderClassesList = () => {
+        if (this.state.classes) {
+            return (
+                <List containerStyle={[Styles.marignLRNone, { marginBottom: 20 }]}>
+                    {
+                        this.state.classes.map((l, i) => (
+                            <ListItem
+                                key={i}
+                                title={l.className}
+                                onPress={(e) => { this._handleClassListItemClicked(
+                                    {classId:l.classId, className: l.className}, e)}}
+                            />
+                        ))
+                    }
+                </List>
+            );
+        } else {
+            return (
+                <NormalText>No classes yet. Click the add button to create one.</NormalText>
+            );
+        }
     }
 
     render() {
@@ -136,17 +126,7 @@ export default class Home extends Component {
                         </View>
 
                         <View>
-                            <List containerStyle={[Styles.marignLRNone, { marginBottom: 20 }]}>
-                                {
-                                    this.state.classes.map((l, i) => (
-                                        <ListItem
-                                            key={i}
-                                            title={l.className}
-                                            onPress={() => { alert(l.className) }}
-                                        />
-                                    ))
-                                }
-                            </List>
+                            {this._renderClassesList()}
                         </View>
 
                         
