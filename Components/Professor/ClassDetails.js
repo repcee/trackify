@@ -14,29 +14,37 @@ export default class ClassDetails extends Component {
     constructor(props) {
         super(props);
 
+        const classId = this.props.navigation.getParam('classData').classId;
         this.state = {
-            className: this.props.navigation.getParam('classData').className,
-            classId: this.props.navigation.getParam('classData').classId,
+            classId: classId,
+            isLoading: true,
+            classData: null,
+            c: null,
 
             enrolledStudents: null,
             unlinkedStudents: null,
+
             attendance: null,
             classData: null,
-
-            // others
-            isLoading: true        
-        };
+            indexInProfList: null
+        }
+        
     }
 
     componentWillMount() {
         const classd = ClassService.getClass(this.state.classId, (classDets) => {
             if (classDets !== null) {
-                console.log("*********Day 0: ", classDets.meetingDays);
                 this.setState({
                     classData: classDets,
+
+                    // Used for quick access. classDets object is actually passed to AddEdit screen.
                     enrolledStudents: classDets.enrolledStudents ? Object.values(classDets.enrolledStudents).reverse() : null,
                     unlinkedStudents: classDets.unlinkedStudents || null,
-                    isLoading: false
+
+                    attendance: null,
+
+                    isLoading: false,
+                    indexInProfList: this.props.navigation.getParam('classData').indexInProfList
                 });
             } else {
                 this.props.navigation.dispatch(
@@ -46,8 +54,12 @@ export default class ClassDetails extends Component {
                 );
                 alert("Class not found");
             }
-           
         });
+    }
+
+    _handleForceUpdate = () => {
+        console.log("Force updated.");
+        this.forceUpdate();
     }
 
     _linkStudentToClassByDeviceId = (deviceId) => {
@@ -75,11 +87,9 @@ export default class ClassDetails extends Component {
     }
 
     _handleEditButtonClicked = (err) => {
-        const classDets = {isLoading, ...classData} = this.state.classData;
-        console.log(classData);
-
-        this.props.navigation.navigate('AddEditClass', 
-            {mode: 'edit', classData: classData
+        this.props.navigation.navigate('AddEditClass', {
+            mode: 'edit', classId: this.state.classId, classData: this.state.classData,
+            forceUpdateHandler: this._handleForceUpdate.bind(this)
         });
     }
 
@@ -132,56 +142,57 @@ export default class ClassDetails extends Component {
     }
 
     _rednerDetails = () => {
-        if (this.state.isLoading) {
-            return (
-                <ActivityIndicator size='large' color={Colors.primaryDark} />
-            );
-        } else {
-            return (
-                <View style={[Styles.container]}>
+
+        return (
+            <View style={[Styles.container]}>
                 <NormalText>{this.state.classData.description}</NormalText>
 
-                <View style={[Styles.marT]}>                
+                <View style={[Styles.marT]}>
                     <SubHeadingText style={[Styles.textBold]}>Unlinked Students</SubHeadingText>
                     {this._renderUnLinkedStudents()}
                 </View>
 
-                <View style={[Styles.marginTLarge]}>                
+                <View style={[Styles.marginTLarge]}>
                     <SubHeadingText style={[Styles.textBold]}>Enrolled Students</SubHeadingText>
                     {this._renderEnrolledStudents()}
                 </View>
             </View>
-            );
-        }
+        );
     }
 
     render() {
-        return (
-            <View style={[Styles.mainContainer]}>
-                <View style={[Styles.navbar]}>
+        if (!this.state.isLoading) {
+            return (
+                <View style={[Styles.mainContainer]}>
+                    <View style={[Styles.navbar]}>
 
-                    <View style={[Styles.navbarLeft]}>
-                        <Icon name="arrow-left" type="font-awesome"
-                            color={Colors.headerTextIcons} />
+                        <View style={[Styles.navbarLeft]}>
+                            <Icon name="arrow-left" type="font-awesome"
+                                color={Colors.headerTextIcons} />
+                        </View>
+
+                        <Text style={[Styles.pageTitle]}>{this.state.classData.className}</Text>
+
+                        <View style={Styles.navbarRight}>
+                            <Icon name="edit" type="font-awesome"
+                                raised
+                                reverse
+                                size={20}
+                                color={Colors.headerTextIcons}
+                                onPress={() => { this._handleEditButtonClicked() }}
+                            />
+                        </View>
                     </View>
+                    <ScrollView>
+                        {this._rednerDetails()}
+                    </ScrollView>
 
-                    <Text style={[Styles.pageTitle]}>{this.state.className}</Text>
-
-                    <View style={Styles.navbarRight}>
-                        <Icon name="edit" type="font-awesome"
-                            raised
-                            reverse
-                            size={20}
-                            color={Colors.headerTextIcons}
-                            onPress={() => {this._handleEditButtonClicked()}}
-                        />
-                    </View>
                 </View>
-                <ScrollView>
-                    {this._rednerDetails()}
-                </ScrollView>
-
-            </View>
-        );
+            );
+        } else {
+            return (
+                <ActivityIndicator size='large' color={Colors.primaryDark} />
+            );
+        }
     }
 }

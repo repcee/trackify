@@ -66,7 +66,6 @@ export default class Home extends Component {
 
     _handleClassListItemClicked = (classData) => {
         this.props.navigation.navigate('ClassDetails', {classData: classData});
-        // alert("heading to " + classData.classId);
     }
 
     _renderClassesList = () => {
@@ -79,7 +78,7 @@ export default class Home extends Component {
                                 key={i}
                                 title={l.className}
                                 onPress={(e) => { this._handleClassListItemClicked(
-                                    {classId:l.classId, className: l.className}, e)}}
+                                    {classId:l.classId, className: l.className, indexInProfList: i}, e)}}
                             />
                         ))
                     }
