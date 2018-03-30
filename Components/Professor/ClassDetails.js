@@ -289,6 +289,13 @@ export default class ClassDetails extends Component {
         });
     }
 
+    _handleEnrolledStudentClicked = (deviceId) => {
+        this.props.navigation.navigate('StudentDetails', {
+            deviceId: deviceId,
+            classId: this.state.classId
+        });
+    }
+
     _renderEnrolledStudents = () => {
         if (this.state.enrolledStudents) {
             return (
@@ -296,10 +303,10 @@ export default class ClassDetails extends Component {
                     {
                         this.state.enrolledStudents.map((l, i) => (
                             <ListItem
-                                key={i}
+                                key={l.deviceId}
                                 title={`${l.firstName} ${l.lastName}`}
-                                onPress={() => {
-                                    alert("Okay");
+                                onPress={(e) => {
+                                    this._handleEnrolledStudentClicked(l.deviceId, e)
                                 }}
                             />
                         ))
@@ -413,13 +420,6 @@ export default class ClassDetails extends Component {
                                     onChangeText={(text) => this._handleLastNameInputChanged(text)} />
                             </View>
 
-                            {
-                                this.state.isFetchingAddr ? (
-                                    <View style={[Styles.marginBLarge]}>
-                                        <ActivityIndicator size='large' color={Colors.primaryDark} />
-                                    </View>
-                                ) : (null)
-                            }
                             <View style={[{alignItems: 'center'}]}>
                                 <NormalText style={[Styles.marginBSmall, Styles.textBold]}>Click the button below to scan the student's QR code to link the student to the class.</NormalText>
                                 <Icon

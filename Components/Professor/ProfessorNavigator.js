@@ -6,6 +6,7 @@ import Home from './Home';
 import Settings from './Settings';
 import SchoolLocation from './SchoolLocation';
 import ClassDetails from './ClassDetails';
+import StudentDetails from './StudentDetails';
 import AddEditClass from './AddEditClass';
 import { StackNavigator } from 'react-navigation';
 
@@ -65,6 +66,13 @@ const Dashboard = TabNavigator({
 
 		ClassDetails: {
 		  screen: ClassDetails,
+		  navigationOptions: {
+			header: null
+		  }
+		},
+
+		StudentDetails: {
+		  screen: StudentDetails,
 		  navigationOptions: {
 			header: null
 		  }
