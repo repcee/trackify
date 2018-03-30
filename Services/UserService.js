@@ -63,16 +63,6 @@ export default class UserService {
         });
     }
 
-    static async getProfessorClassesOwned(userId) {
-        const classesOwnedRoot = this.getReferenceToUser(userId).child('/classesOwned');
-
-        return await classesOwnedRoot.set(classData).then(() => {
-            return true;
-        }).catch((err) => {
-            return false;
-        });
-    }
-
     static async addEditProfessorClassesOwned(userId, classId, classData) {
         const classesOwnedRoot = this.getReferenceToUser(userId).child(`/classesOwned/${classId}`);
 
@@ -83,16 +73,7 @@ export default class UserService {
         });
     }
 
-    // static async updateProfessorClassesOwned(userId, classId, classData) {
-    //     const classesOwnedRoot = this.getReferenceToUser(userId).child(`/classesOwned/${classId}`);
-
-    //     return await classesOwnedRoot.set(classData).then(() => {
-    //         return true;
-    //     }).catch((err) => {
-    //         return false;
-    //     });
-    // }
-
+   
     // static updateDevice = (deviceId, firstName, lastName, userType) => {
     //     const firebaseApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
     //     return firebaseApp.database().ref('devices/' + deviceId).set({
