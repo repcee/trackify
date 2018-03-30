@@ -23,7 +23,7 @@ export const Defaults = {
 	marginSmall: 10,
 	marginLarge: 20,
 	padding: 20,
-	containerPadding: 40,
+	containerPadding: 20,
 	paddingSmall: 10,
 	fontFamilyRegular: 'OpenSans-Regular',
 	fontFamilyLight: 'OpenSans-Light',
@@ -41,7 +41,7 @@ export const Styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: 'transparent',
-		padding: Defaults.containerPadding,
+		padding: Defaults.containerPadding
 		// padding: Defaults.padding
 	},
 	// Center on both axises

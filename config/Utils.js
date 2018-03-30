@@ -8,4 +8,21 @@ export default class Utils {
         }
         return rawMessage;
     }
+
+    static convertFirebaseObjectToArray(firebaseObject) {
+        let _arr = new Array();
+
+        try {
+            for(item in firebaseObject) {
+                _arr[parseInt(item)] = firebaseObject[item];
+            }
+        } catch(err) {
+            console.log(err);
+            return null;
+        }
+
+        console.log("RETURNED: ", _arr);
+
+        return _arr;        
+    }
 }
