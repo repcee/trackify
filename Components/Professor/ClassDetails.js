@@ -24,23 +24,20 @@ export default class ClassDetails extends Component {
             classData: null,
 
             // others
-            isLoading: true,
-            testDeviceId: null
+            isLoading: true        
         };
     }
 
     componentWillMount() {
         const classd = ClassService.getClass(this.state.classId, (classDets) => {
             if (classDets !== null) {
-                console.log("details: ", classDets.enrolledStudents);
-
+                console.log("*********Day 0: ", classDets.meetingDays);
                 this.setState({
                     classData: classDets,
                     enrolledStudents: classDets.enrolledStudents ? Object.values(classDets.enrolledStudents).reverse() : null,
                     unlinkedStudents: classDets.unlinkedStudents || null,
                     isLoading: false
                 });
-                console.log("enrolled: ", this.state.unlinkedStudents);
             } else {
                 this.props.navigation.dispatch(
                     NavigationActions.back({
@@ -53,21 +50,15 @@ export default class ClassDetails extends Component {
         });
     }
 
-    _handleUnlinkedStudentClicked = async (unlinedStudentIndex) => {
-        // this.props.navigation.navigate('LinkStudentByQRCode', {
-        //     classId: this.state.classId, 
-        //     className: this.state.className,
-        //     unlinkedIndex: unlinedStudentIndex,
-        //     studentName: this.state.unlinkedStudents[unlinedStudentIndex]
-        // });
+    _linkStudentToClassByDeviceId = (deviceId) => {
+        alert("Device id: " + deviceId);
+    }
 
+    _handleUnlinkedStudentClicked = async (unlinedStudentIndex) => {
         try {
             const deviceId = await LinkStudentQRScanner.scanQRCode();
-            console.log("Did: ", deviceId);
-            this.setState({
-                testDeviceId: deviceId
-            });
-            alert("Device id: " + deviceId);
+            
+            this._linkStudentToClassByDeviceId(deviceId);
         } catch(err) {
             console.log(err);
             alert("An error occurred.");
@@ -75,7 +66,6 @@ export default class ClassDetails extends Component {
     }
 
     _onScanDeviceIdSuccess = (deviceId) => {
-        console.log(deviceId);
         alert("Device Id is: " + deviceId);
     }
 
@@ -85,7 +75,12 @@ export default class ClassDetails extends Component {
     }
 
     _handleEditButtonClicked = (err) => {
-        alert("To be implemented.");
+        const classDets = {isLoading, ...classData} = this.state.classData;
+        console.log(classData);
+
+        this.props.navigation.navigate('AddEditClass', 
+            {mode: 'edit', classData: classData
+        });
     }
 
     _renderEnrolledStudents = () => {
@@ -149,8 +144,6 @@ export default class ClassDetails extends Component {
                 <View style={[Styles.marT]}>                
                     <SubHeadingText style={[Styles.textBold]}>Unlinked Students</SubHeadingText>
                     {this._renderUnLinkedStudents()}
-
-                    <NormalText>{this.state.testDeviceId}</NormalText>
                 </View>
 
                 <View style={[Styles.marginTLarge]}>                
@@ -163,7 +156,6 @@ export default class ClassDetails extends Component {
     }
 
     render() {
-        console.log(this.state.classData);
         return (
             <View style={[Styles.mainContainer]}>
                 <View style={[Styles.navbar]}>
