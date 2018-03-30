@@ -83,6 +83,23 @@ export default class ClassService {
         }
     }
 
+    static async updateEnrolledStudentData(details) {
+
+        const enrolledStudentRoot = this.getReferenceToClass(details.classId).child(`/enrolledStudents/${details.deviceId}`);
+
+        const {classId, ...studentDetails} = details;
+        const result = await enrolledStudentRoot.set(studentDetails);
+        return result !== null;
+    }
+
+    static getEnrolledStudent(classId, deviceId, callback) {
+        const root = this.getReferenceToClass(classId).child(`/enrolledStudents/${deviceId}`);
+
+        return root.on('value', (dataSnap) => {
+            callback(dataSnap.val());
+        });
+    }
+
     static async addEditUnlinkedStudents(classId, listOfStudents) {
         const unlinedStudentsRef = this.getReferenceToClass(classId).child('/unlinkedStudents');
         const result = await unlinedStudentsRef.set(listOfStudents);
