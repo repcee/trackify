@@ -54,16 +54,6 @@ export default class AddEditClass extends Component {
 
                 teacherId: null,
 
-                // Other state
-                submitDisabled: false,
-
-                // Not used right now.
-                addressLine1: null,
-                addressCity: null,
-                addressState: null,
-                addressZip: null,
-
-
 
                 // Other state
                 submitDisabled: false,
@@ -230,7 +220,7 @@ export default class AddEditClass extends Component {
 
         // Validate meeting days checkboxes
         let numDaysSelected = 0;
-        for(day of this.state.meetingDays) {
+        for(let day of this.state.meetingDays) {
             day ? numDaysSelected++ : null;
         }
 
@@ -268,26 +258,24 @@ export default class AddEditClass extends Component {
             submitDisabled: true
         });
 
-        // Validate string inputs
         if (this._isFormDataValid()) {
             this.state.mode === 'edit' ? this._updateClass() : this._addClass();
         } else {
             this._displayFormErrors();
+
+            this.setState({ 
+                submitDisabled: false
+            });
+
             alert("Please fix all the error and try again");
         }
-
-        // Validate school address
-        
-        this.setState({ 
-            submitDisabled: false
-        });
     }
 
     /**
      * Adds a new class to the database after it has bee validated.
      */
     _addClass = () => {
-        const { submitDisabled, ...classData } = this.state;
+        const { submitDisabled, formErrors, mode, ...classData } = this.state;
         classData.createdAt = classData.updatedAt = Date.now();
 
         ClassService.addClass(classData).then((res) => {
@@ -306,10 +294,24 @@ export default class AddEditClass extends Component {
      * Updates an existing class in the database.
      */
     _updateClass = () => {
-        const { submitDisabled, ...classData } = this.state;
+        const { submitDisabled, formErrors, mode, ...classData } = this.state;
+        const classId = this.props.navigation.getParam('classId');
         classData.updatedAt = Date.now();
+        // console.log(classData);
 
-        alert("Updating");
+        ClassService.updateClass(classId, classData).then((res) => {
+            this.props.navigation.getParam('forceUpdateHandler')()
+            this.props.navigation.dispatch(
+                NavigationActions.back({
+                    key: null
+                })
+            );
+        }).catch((err) => {
+            console.log(err);
+            alert("An error occurred.");
+        });
+
+        // alert("Updating " + classId);
     }
 
     /**

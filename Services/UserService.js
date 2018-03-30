@@ -73,7 +73,7 @@ export default class UserService {
         });
     }
 
-    static async addProfessorClassesOwned(userId, classId, classData) {
+    static async addEditProfessorClassesOwned(userId, classId, classData) {
         const classesOwnedRoot = this.getReferenceToUser(userId).child(`/classesOwned/${classId}`);
 
         return await classesOwnedRoot.set(classData).then(() => {
@@ -82,6 +82,16 @@ export default class UserService {
             return false;
         });
     }
+
+    // static async updateProfessorClassesOwned(userId, classId, classData) {
+    //     const classesOwnedRoot = this.getReferenceToUser(userId).child(`/classesOwned/${classId}`);
+
+    //     return await classesOwnedRoot.set(classData).then(() => {
+    //         return true;
+    //     }).catch((err) => {
+    //         return false;
+    //     });
+    // }
 
     // static updateDevice = (deviceId, firstName, lastName, userType) => {
     //     const firebaseApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
