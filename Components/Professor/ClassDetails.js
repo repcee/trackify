@@ -5,7 +5,8 @@ import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
 import { NavigationActions } from 'react-navigation';
 import { Styles, Colors } from '../../config/AppTheme';
-import { NormalText, SubHeadingText, PrimaryDarkButton, AccentButton } from '../UtilComponents';
+import { NormalText, SubHeadingText, PrimaryDarkButton, PrimaryButton, AccentButton, HeadingText, NormalInput, BlackButton} from '../UtilComponents';
+import Modal from 'react-native-modal';
 import ClassService from '../../Services/ClassService';
 import LinkStudentQRScanner from './LinkStudentQRScanner';
 
@@ -18,11 +19,21 @@ export default class ClassDetails extends Component {
         this.state = {
             classId: classId,
             isLoading: true,
+            addStudentModal: false,
+            submitDisabled: false,
+
+            isEditingUnlinked: false,
+            currentUnlinkedIndex: null,
+
+
+            // modal inputs
+            firstName: null,
+            lastName:  null,
+
             classData: null,
-            c: null,
 
             enrolledStudents: null,
-            unlinkedStudents: null,
+            unlinkedStudents: [],
 
             attendance: null,
             classData: null,
@@ -38,8 +49,8 @@ export default class ClassDetails extends Component {
                     classData: classDets,
 
                     // Used for quick access. classDets object is actually passed to AddEdit screen.
-                    enrolledStudents: classDets.enrolledStudents ? Object.values(classDets.enrolledStudents).reverse() : null,
-                    unlinkedStudents: classDets.unlinkedStudents || null,
+                    enrolledStudents: classDets.enrolledStudents ? Object.values(classDets.enrolledStudents).reverse() : [],
+                    unlinkedStudents: classDets.unlinkedStudents || [],
 
                     attendance: null,
 
@@ -58,23 +69,86 @@ export default class ClassDetails extends Component {
     }
 
     _handleForceUpdate = () => {
-        console.log("Force updated.");
         this.forceUpdate();
     }
 
+    /**
+     * Links the student to the class in the database.
+     */
     _linkStudentToClassByDeviceId = (deviceId) => {
-        alert("Device id: " + deviceId);
+        let details = {
+            classId: this.state.classId,
+            className: this.state.classData.className,
+            deviceId: deviceId,
+            firstName: this.state.firstName,
+            lastName: this.state.lastName,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        }
+
+        ClassService.addEditEnrolledStudentToClass(details).then((res)=>{
+            if (this.state.isEditingUnlinked) {
+                let unlinkedStuds = this.state.unlinkedStudents;
+                // remove the student from the unlinked list.
+                unlinkedStuds.splice(this.state.currentUnlinkedIndex, 1);
+                ClassService.addEditUnlinkedStudents(this.state.classId, unlinkedStuds).then(res => {
+                    if (res) {
+                        this.setState({
+                            submitDisabled: false,
+                            addStudentModal: false,
+                            firstName: null,
+                            lastName: null,
+                            currentUnlinkedIndex: null,
+                            isEditingUnlinked: false,
+                            unlinkedStudents: unlinkedStuds
+                        });
+                    } else {
+                        alert("An error occurred.");
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    alert("An error occurred.");
+                });
+            }   
+        }).catch(err => {
+            console.log(err);
+            alert("An error occurred.");
+        });
+    }
+
+    _handleFirstNameInputChanged = (text) => {
+        this.setState({
+            firstName: text
+        });
+    }
+
+    _handleLastNameInputChanged = (text) => {
+        this.setState({
+            lastName: text
+        });
+    }
+
+    _openQRCodeScanner = async () => {
+        try {
+            const deviceId = await LinkStudentQRScanner.scanQRCode();
+
+            return deviceId;
+        } catch (err) {
+            console.log(err);
+        }
+        return null;
     }
 
     _handleUnlinkedStudentClicked = async (unlinedStudentIndex) => {
-        try {
-            const deviceId = await LinkStudentQRScanner.scanQRCode();
-            
-            this._linkStudentToClassByDeviceId(deviceId);
-        } catch(err) {
-            console.log(err);
-            alert("An error occurred.");
-        }         
+        const [firstName, lastName] = this.state.unlinkedStudents[unlinedStudentIndex].split(" ");
+        
+        this.setState({
+            firstName: firstName,
+            lastName: lastName,
+            addStudentModal: true,
+            isEditingUnlinked: true,
+            currentUnlinkedIndex: unlinedStudentIndex
+        });
     }
 
     _onScanDeviceIdSuccess = (deviceId) => {
@@ -90,6 +164,128 @@ export default class ClassDetails extends Component {
         this.props.navigation.navigate('AddEditClass', {
             mode: 'edit', classId: this.state.classId, classData: this.state.classData,
             forceUpdateHandler: this._handleForceUpdate.bind(this)
+        });
+    }
+
+    /**
+     * Helper method to valid some of the form inputs.
+     */
+    _isValidInput = (inputText) => {
+        return inputText != null && inputText.trim().length > 0;
+    }
+
+     /**
+     * Validates the data that the user has entered into the form before the data is submitted.
+     */
+    _isFormDataValid = () => {
+        const inputs = ['firstName', 'lastName'];        
+
+        let validInputs = 0;
+
+        for(input of inputs) {
+            if (this._isValidInput(this.state[input])) {
+                validInputs++;
+            }
+        }
+
+        return validInputs == inputs.length;
+    }
+
+    /**
+     * Responds when the user clicks the "link later" button in the modal.
+     * Closes the modal and pushes the new student onto the unlinkedstudents array and updates the database.
+     */
+    _handleLinkStudentLaterClicked = () => {
+        this.setState({
+            submitDisabled: true
+        });
+
+        if (!this._isFormDataValid()) {
+            alert("Please fill in the student's name first");
+        } else {
+            let unlinkedStuds = this.state.unlinkedStudents;
+            const name = `${this.state.firstName} ${this.state.lastName}`;
+
+            if (this.state.isEditingUnlinked) {                
+                unlinkedStuds[this.state.currentUnlinkedIndex] = name;
+            } else {
+                this.state.unlinkedStudents.push(name);
+            }
+            
+            ClassService.addEditUnlinkedStudents(this.state.classId, this.state.unlinkedStudents).then(res => {
+                if (res) {
+                    this.setState({
+                        submitDisabled: false,
+                        addStudentModal: false,
+                        firstName: null,
+                        lastName: null,
+                        currentUnlinkedIndex: null,
+                        isEditingUnlinked: false
+                    });
+                } else {
+                    alert("An error occurred.");
+                }
+            }).catch(err => {
+                console.log(err);
+                alert("An error occurred.");
+            });
+            
+        }
+
+        this.setState({
+            submitDisabled: false
+        });
+    }
+
+    /**
+     * Responds to the QR code button being clicked.
+     * Call the method to open the QR code scanner.
+     */
+    _handleLinkStudentClicked = () => {
+        this.setState({
+            submitDisabled: true
+        });
+
+        if (!this._isFormDataValid()) {
+            alert("Please fill in the student's name first");
+        } else {
+            this._openQRCodeScanner().then(deviceId=>{
+                if (deviceId != null) {
+                    this._linkStudentToClassByDeviceId(deviceId);
+
+                    this.setState({
+                        addStudentModal: false,
+                        firstName: null,
+                        lastName: null
+                    });
+                    
+                }
+            });
+           
+        }
+
+        this.setState({
+            submitDisabled: false
+        });
+    }
+
+    
+    _handleCancelAddStudentClicked = () => {
+        this.setState({
+            addStudentModal: false,
+            firstName: null,
+            lastName: null,
+            isEditingUnlinked: false,
+            currentUnlinkedIndex: null
+        });
+    }
+
+    /**
+     * Makes the add student modal visible.
+     */
+    _handleAddStudentModalClicked = () => {
+        this.setState({
+            addStudentModal: true
         });
     }
 
@@ -147,14 +343,30 @@ export default class ClassDetails extends Component {
             <View style={[Styles.container]}>
                 <NormalText>{this.state.classData.description}</NormalText>
 
-                <View style={[Styles.marT]}>
-                    <SubHeadingText style={[Styles.textBold]}>Unlinked Students</SubHeadingText>
-                    {this._renderUnLinkedStudents()}
+                 <View style={[{flex:2, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between'}]}>
+                    <View style={[{ flex: 1 }]}>
+                        <HeadingText>Students</HeadingText>
+                    </View>
+                    <View style={[{ flex: 1, alignItems: 'flex-end' }]}>
+                        <Icon
+                            raised
+                            reverse
+                            size={20}
+                            name='user-plus'
+                            type='font-awesome'
+                            color={Colors.black} 
+                            onPress={() => {this._handleAddStudentModalClicked()}} />
+                    </View>
                 </View>
 
                 <View style={[Styles.marginTLarge]}>
                     <SubHeadingText style={[Styles.textBold]}>Enrolled Students</SubHeadingText>
                     {this._renderEnrolledStudents()}
+                </View>
+
+                 <View style={[Styles.marT]}>
+                    <SubHeadingText style={[Styles.textBold]}>Unlinked Students</SubHeadingText>
+                    {this._renderUnLinkedStudents()}
                 </View>
             </View>
         );
@@ -187,11 +399,67 @@ export default class ClassDetails extends Component {
                         {this._rednerDetails()}
                     </ScrollView>
 
+                    <Modal isVisible={this.state.addStudentModal} style={Styles.bottomModal}>
+                        <View style={Styles.modalContent}>
+                            <HeadingText>Add student to class</HeadingText>
+
+                            <View style={[{ flexDirection: 'row' }, Styles.marginB]}>
+                                <NormalInput placeholder="First Name" disabled={this.state.submitDisabled} 
+                                    value={this.state.firstName} style={{ flex: 1 }}
+                                    onChangeText={(text) => this._handleFirstNameInputChanged(text)} />
+
+                                <NormalInput placeholder="Last Name" disabled={this.state.submitDisabled}
+                                    value={this.state.lastName} style={{ flex: 1 }}
+                                    onChangeText={(text) => this._handleLastNameInputChanged(text)} />
+                            </View>
+
+                            {
+                                this.state.isFetchingAddr ? (
+                                    <View style={[Styles.marginBLarge]}>
+                                        <ActivityIndicator size='large' color={Colors.primaryDark} />
+                                    </View>
+                                ) : (null)
+                            }
+                            <View style={[{alignItems: 'center'}]}>
+                                <NormalText style={[Styles.marginBSmall, Styles.textBold]}>Click the button below to scan the student's QR code to link the student to the class.</NormalText>
+                                <Icon
+                                    disabled={this.state.submitDisabled}
+                                    raised
+                                    reverse
+                                    size={50}
+                                    name='qrcode'
+                                    type='font-awesome'
+                                    color={Colors.positive}
+                                    onPress={() => { this._handleLinkStudentClicked() }} />
+                            </View>
+
+                            <View  style={[Styles.marginBSmall, Styles.marginTSmall]}>
+                                <NormalText>If you just want to add the student and scan the QR code later, press "Link Later".</NormalText>
+                            </View>
+
+                            <View style={[{ flexDirection: 'row', justifyContent: 'space-between' }, Styles.marginT]}>
+                                <View style={[{ flex: 1 }]}>
+                                    <BlackButton style={[Styles.btnSmall]} disabled={this.state.submitDisabled}
+                                    text="Cancel" onPress={() => { this._handleCancelAddStudentClicked() }} />
+                                </View>
+                                <View style={[{ flex: 1 }]}>
+                                    <PrimaryDarkButton disabled={this.state.submitDisabled} 
+                                    style={[Styles.btnSmall]} text="Link Later" onPress={() => { this._handleLinkStudentLaterClicked() }} />
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+
                 </View>
             );
         } else {
             return (
-                <ActivityIndicator size='large' color={Colors.primaryDark} />
+                <View style={[Styles.mainContainer]}>
+                    <View style={[Styles.container, Styles.centerContents]}>
+                        <ActivityIndicator size='large' color={Colors.primaryDark} />
+                    </View>
+                    
+                </View>
             );
         }
     }
