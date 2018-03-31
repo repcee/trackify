@@ -72,7 +72,7 @@ export default class PageWithHeaderandScrollView extends Component {
         let selectedDay = null;
         let enrolledStudents = Object.assign(this.state.formattedEnrolledStudents);
 
-        if(this.state.classData.attendance) {
+        if(this.state.classData.attendance && this.state.classData.attendance[`${dayAsTimestamp}`]) {
             selectedDay = this.state.classData.attendance[`${dayAsTimestamp}`];
         }
 
