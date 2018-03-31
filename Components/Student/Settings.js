@@ -5,7 +5,7 @@ import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
 
 import { Styles, Colors } from '../../config/AppTheme';
-import { NormalText, SubHeadingText, PrimaryDarkButton, AccentButton } from '../UtilComponents';
+import { NormalText, HeadingText, PrimaryDarkButton, NegativeButton, SubHeadingText } from '../UtilComponents';
 
 
 export default class PageWithHeaderandScrollView extends Component {
@@ -34,11 +34,22 @@ export default class PageWithHeaderandScrollView extends Component {
                     </View>
                 </View>
                 <ScrollView>
-                    <View style={[Styles.container, Styles.centerContents]}>
-                        <SubHeadingText>Student Settings here.</SubHeadingText>
+                    <View style={[Styles.container]}>
 
-                        <View style={[Styles.marginTLarge]}>
-                            <AccentButton text="Sigin Out" onPress={() => {this._handleSiginOutClicked()}} />
+                        <View>
+                            <HeadingText>Account Session</HeadingText>
+                            <View style={[Styles.centerContents]}>
+                                <NegativeButton text="Sign Out" onPress={() => { this._handleSiginOutClicked() }} />
+                            </View>
+                        </View>
+
+                        <View style={[Styles.marginT]}>
+                            <SubHeadingText>FAQs</SubHeadingText>
+
+                            <View style={[Styles.marginB]}>
+                                <NormalText style={[Styles.textBold]}>Q: How do I unregister from a class?</NormalText>
+                                <NormalText>A: Students aren't allowed to unregister themselves from classes. Only teachers/professors can unregister students.</NormalText>
+                            </View>
                         </View>
                     </View>
                 </ScrollView>
