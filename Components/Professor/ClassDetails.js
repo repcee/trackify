@@ -354,6 +354,14 @@ export default class ClassDetails extends Component {
         }
     }
 
+    _handleBackButtonClicked = () => {
+        this.props.navigation.dispatch(
+            NavigationActions.back({
+                key: null
+            })
+        );
+    }
+
     _rednerDetails = () => {
 
         return (
@@ -422,7 +430,9 @@ export default class ClassDetails extends Component {
 
                         <View style={[Styles.navbarLeft]}>
                             <Icon name="arrow-left" type="font-awesome"
-                                color={Colors.headerTextIcons} />
+                                  color={Colors.headerTextIcons}
+                                  onPress={() => { this._handleBackButtonClicked() }}
+                            />
                         </View>
 
                         <Text style={[Styles.pageTitle]}>{this.state.classData.className}</Text>

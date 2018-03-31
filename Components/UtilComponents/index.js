@@ -1,6 +1,6 @@
 import { NormalText, HeadingText, SubHeadingText } from "./Texts";
 import { PrimaryButton, PrimaryDarkButton, AccentButton, PositiveButton, WarningButton, NegativeButton, BlackButton } from "./Buttons";
-import { NormalInput, EmailInput, PasswordInput, NumericInput } from "./Inputs";
+import { NormalInput, EmailInput, PasswordInput, ConfirmPasswordInput, FirstNameInput, LastNameInput, SchoolInput, NumericInput } from "./Inputs";
 export {
     // Texts
     NormalText, 
@@ -20,5 +20,9 @@ export {
     NormalInput,
     EmailInput,
     PasswordInput,
-    NumericInput 
+    NumericInput,
+    FirstNameInput,
+    LastNameInput,
+    SchoolInput,
+    ConfirmPasswordInput
 }
