@@ -63,6 +63,11 @@ export default class Home extends Component {
         this.props.navigation.navigate('ClassDetails', {classData: classData});
     }
 
+    _handleSignOutClick = async () => {
+        alert("Signing out...");
+        AuthService.signOutCurrentUser();
+
+    }
     _renderClassesList = () => {
         if (this.state.classes) {
             return (
@@ -101,6 +106,7 @@ export default class Home extends Component {
 
                         <Text style={[Styles.pageTitle]}>Dashboard</Text>
 
+<<<<<<< HEAD
                         <View style={Styles.navbarRight}>
                         </View>
                     </View>
@@ -121,6 +127,30 @@ export default class Home extends Component {
                                             color={Colors.black}
                                             onPress={() => this._handleAddClassClick()} />
                                     </View>
+=======
+                    <View style={[Styles.navbarRight]}>
+                        <Icon name="sign-out" type="font-awesome"
+                              color={Colors.headerTextIcons}
+                              onPress={() => { this._handleSignOutClick() }} />
+                    </View>
+                </View>
+                <ScrollView>
+                    <View style={[Styles.container]}>
+                        
+                        <View>
+                            <View style={[{ flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
+                                <View style={[{ flex: 1 }]}>
+                                    <SubHeadingText>Your Classes</SubHeadingText>
+                                </View>
+                                <View style={[{ flex: 1, alignItems: 'flex-end' }]}>
+                                    <Icon
+                                        raised
+                                        reverse
+                                        name='plus'
+                                        type='font-awesome'
+                                        color={Colors.black}
+                                        onPress={() => this._handleSignOutClick()} />
+>>>>>>> 2e65b710a18f332da39f591494935ea9489585bd
                                 </View>
                             </View>
 
