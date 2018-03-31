@@ -4,6 +4,7 @@ import { Icon } from 'react-native-elements';
 import MapsService from '../../Services/MapsService';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import Modal from 'react-native-modal';
+import { NavigationActions } from 'react-navigation';
 
 import { Styles, Colors } from '../../config/AppTheme';
 import { NormalText, SubHeadingText, AccentButton, NormalInput, NumericInput, BlackButton } from '../UtilComponents';
@@ -125,6 +126,14 @@ export default class SchoolLocation extends Component {
 
     }
 
+    _handleBackButtonClicked = () => {
+        this.props.navigation.dispatch(
+            NavigationActions.back({
+                key: null
+            })
+        );
+    }
+
     /**
      * Handles the update school address form submit.
      */
@@ -214,13 +223,16 @@ export default class SchoolLocation extends Component {
 
                     <View style={[Styles.navbarLeft]}>
                         <Icon name="arrow-left" type="font-awesome"
-                            color={Colors.headerTextIcons} />
+                            color={Colors.headerTextIcons} 
+                            onPress={() => this._handleBackButtonClicked()}
+                            />
                     </View>
 
                     <Text style={[Styles.pageTitle]}>Class Location</Text>
 
                     <View style={Styles.navbarRight}>
-
+                    <NormalText style={[Styles.textBold, Styles.textColorBlack]} 
+                        onPress={() => this._handleBackButtonClicked()}>Done</NormalText>
                     </View>
                 </View>
 
