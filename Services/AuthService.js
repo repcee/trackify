@@ -51,6 +51,16 @@ export default class AuthService {
         // });
     }
 
+    static createUser(email,password){
+        return new Promise((resolve, reject) => {
+            FirebaseApp.auth().createUserWithEmailAndPassword(email,password)
+                .catch ((error) =>{
+                    console.log("si: ", Utils.formatFirebaseMessage(error.message));
+                    reject(Utils.formatFirebaseMessage(error.message))
+                });
+        });
+    }
+
     /**
      * Students are logged in as anonymous users in firebase.
      */
