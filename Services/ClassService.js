@@ -41,6 +41,37 @@ export default class ClassService {
         }
     }
 
+    static async deleteClass(classId) {
+
+        // Remove class from users
+        FirebaseApp.database().ref('/users').once('value', snapshot => {
+            snapshot.forEach(userSnapshot => {
+                const classesOwned = Object.keys(userSnapshot.val().classesOwned);
+                if (classesOwned.includes(classId)) {
+                    const { userId } = userSnapshot.val();
+                    FirebaseApp.database().ref(`/users/${userId}/classesOwned/${classId}`).remove();
+                }
+            })
+        });
+
+        // Remove class from devices
+        FirebaseApp.database().ref('/devices').once('value', snapshot => {
+            snapshot.forEach(deviceSnapshot => {
+                const classesEnrolled = Object.keys(deviceSnapshot.val().classesEnrolled);
+                if (classesEnrolled.includes(classId)) {
+                    const { key } = deviceSnapshot;
+                    FirebaseApp.database().ref(`/devices/${key}/classesEnrolled/${classId}`).remove();
+                    // console.log(classId);
+                }
+            })
+        });
+
+        // Remove class from classes
+        const classRef = this.getReferenceToClass(classId);
+        const delteClassRes = await classRef.remove();
+
+    }
+
     static async updateClass(classId, classDetails) {
 
         const classRoot = this.getReferenceToClassesRoot().child(`/${classId}`);
