@@ -106,8 +106,10 @@ export default class Home extends Component {
 
                         <Text style={[Styles.pageTitle]}>Dashboard</Text>
 
-<<<<<<< HEAD
-                        <View style={Styles.navbarRight}>
+                        <View style={[Styles.navbarRight]}>
+                            <Icon name="sign-out" type="font-awesome"
+                                color={Colors.headerTextIcons}
+                                onPress={() => { this._handleSignOutClick() }} />
                         </View>
                     </View>
                     <ScrollView>
@@ -116,7 +118,7 @@ export default class Home extends Component {
                             <View>
                                 <View style={[{ flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
                                     <View style={[{ flex: 1 }]}>
-                                        <HeadingText>Your Classes</HeadingText>
+                                        <SubHeadingText>Your Classes</SubHeadingText>
                                     </View>
                                     <View style={[{ flex: 1, alignItems: 'flex-end' }]}>
                                         <Icon
@@ -125,40 +127,15 @@ export default class Home extends Component {
                                             name='plus'
                                             type='font-awesome'
                                             color={Colors.black}
-                                            onPress={() => this._handleAddClassClick()} />
+                                            onPress={() => this._handleSignOutClick()} />
                                     </View>
-=======
-                    <View style={[Styles.navbarRight]}>
-                        <Icon name="sign-out" type="font-awesome"
-                              color={Colors.headerTextIcons}
-                              onPress={() => { this._handleSignOutClick() }} />
-                    </View>
-                </View>
-                <ScrollView>
-                    <View style={[Styles.container]}>
-                        
-                        <View>
-                            <View style={[{ flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
-                                <View style={[{ flex: 1 }]}>
-                                    <SubHeadingText>Your Classes</SubHeadingText>
                                 </View>
-                                <View style={[{ flex: 1, alignItems: 'flex-end' }]}>
-                                    <Icon
-                                        raised
-                                        reverse
-                                        name='plus'
-                                        type='font-awesome'
-                                        color={Colors.black}
-                                        onPress={() => this._handleSignOutClick()} />
->>>>>>> 2e65b710a18f332da39f591494935ea9489585bd
+
+                                <View>
+                                    {this._renderClassesList()}
                                 </View>
+
                             </View>
-
-                            <View>
-                                {this._renderClassesList()}
-                            </View>
-
-
                         </View>
                     </ScrollView>
 

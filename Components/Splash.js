@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Text, View, ActivityIndicator } from 'react-native';
+import { Text, View, ActivityIndicator, Image } from 'react-native';
 import UserService from '../Services/UserService';
 import AuthService from '../Services/AuthService';
 
 
-import { Styles } from '../config/AppTheme';
+import { Styles, Colors} from '../config/AppTheme';
 
 
 export default class Splash extends Component {
@@ -37,9 +37,16 @@ export default class Splash extends Component {
 
 	render() {
 		return (
-			<View style={[Styles.mainContainer, Styles.centerContents, { backgroundColor: 'blue' }]}>
-				<Text style={[Styles.textHeading, Styles.textColorWhite]}>Splash, Splash, Splash...</Text>
-				<ActivityIndicator size="large" color="#ffffff" />
+			<View style={[Styles.mainContainer, Styles.centerContents, { backgroundColor: Colors.primaryDark}]}>
+				<View style={[Styles.marginB]}>
+					<Image source={require('../Assets/trackify-logo.png')} style={{ height: 200, width: 200 }} />
+				</View>
+
+				<View>
+					<Text style={[Styles.textHeading, Styles.textColorBlack]}>Please wait...</Text>
+					<ActivityIndicator size="large" color="white" />
+				</View>
+
 			</View>
 		);
 	}
