@@ -68,6 +68,11 @@ export default class Home extends Component {
         this.props.navigation.navigate('ClassDetails', {classData: classData});
     }
 
+    _handleSignOutClick = async () => {
+        alert("Signing out...");
+        AuthService.signOutCurrentUser();
+
+    }
     _renderClassesList = () => {
         if (this.state.classes) {
             return (
@@ -101,7 +106,10 @@ export default class Home extends Component {
 
                     <Text style={[Styles.pageTitle]}>Dashboard</Text>
 
-                    <View style={Styles.navbarRight}>
+                    <View style={[Styles.navbarRight]}>
+                        <Icon name="sign-out" type="font-awesome"
+                              color={Colors.headerTextIcons}
+                              onPress={() => { this._handleSignOutClick() }} />
                     </View>
                 </View>
                 <ScrollView>
@@ -119,7 +127,7 @@ export default class Home extends Component {
                                         name='plus'
                                         type='font-awesome'
                                         color={Colors.black}
-                                        onPress={() => this._handleAddClassClick()} />
+                                        onPress={() => this._handleSignOutClick()} />
                                 </View>
                             </View>
                         </View>

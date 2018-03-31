@@ -31,6 +31,41 @@ export const PasswordInput = (props) => {
     );
 }
 
+export const ConfirmPasswordInput = (props) => {
+    let { style,underlineColorAndroid, ...others } = props;
+    return (
+        <TextInput underlineColorAndroid={props.underlineColor ? props.underlineColor : Colors.inputUnderlineColor}
+                   keyboardType='default' autoCapitalize='none' autoCorrect={false}
+                   secureTextEntry={true} visible-password={true} {...others}
+                   style={[Styles.inputField, props.style]} />
+    );
+}
+
+export const FirstNameInput = (props) => {
+    let { style,underlineColorAndroid, ...others } = props;
+    return (
+        <TextInput underlineColorAndroid={props.underlineColor ? props.underlineColor : Colors.inputUnderlineColor}
+                   keyboardType='default' autoCapitalize='none' autoCorrect={false} {...others}
+                   style={[Styles.inputField, props.style]} />
+    );
+}
+export const LastNameInput = (props) => {
+    let { style,underlineColorAndroid, ...others } = props;
+    return (
+        <TextInput underlineColorAndroid={props.underlineColor ? props.underlineColor : Colors.inputUnderlineColor}
+                   keyboardType='default' autoCapitalize='none' autoCorrect={false} {...others}
+                   style={[Styles.inputField, props.style]} />
+    );
+}
+export const SchoolInput = (props) => {
+    let { style,underlineColorAndroid, ...others } = props;
+    return (
+        <TextInput underlineColorAndroid={props.underlineColor ? props.underlineColor : Colors.inputUnderlineColor}
+                   keyboardType='default' autoCapitalize='none' autoCorrect={false} {...others}
+                   style={[Styles.inputField, props.style]} />
+    );
+}
+
 export const NumericInput = (props) => {
     let { style,underlineColorAndroid, ...others } = props;
     return (
