@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, ActivityIndicator} from 'react-native';
+import { Text, View, ScrollView, ActivityIndicator, KeyboardAvoidingView} from 'react-native';
 import { Button, Icon, List, ListItem } from 'react-native-elements';
 import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
@@ -237,6 +237,18 @@ export default class ClassDetails extends Component {
         });
     }
 
+    _handleDeleteClassClicked = () => {
+        alert("Deleting class");
+    }
+
+    _handleBackButtonClicked = () => {
+        this.props.navigation.dispatch(
+            NavigationActions.back({
+                key: null
+            })
+        );
+    }
+
     /**
      * Responds to the QR code button being clicked.
      * Call the method to open the QR code scanner.
@@ -309,12 +321,14 @@ export default class ClassDetails extends Component {
     _renderEnrolledStudents = () => {
         if (this.state.enrolledStudents) {
             return (
-                <List containerStyle={[Styles.marignLRNone, { marginBottom: 20 }]}>
+                <List containerStyle={[Styles.marginNone, Styles.listMarginPaddingFix, {paddingLeft: 20, paddingRight: 20}]}>
                     {
                         this.state.enrolledStudents.map((l, i) => (
                             <ListItem
                                 key={l.deviceId}
                                 title={`${l.firstName} ${l.lastName}`}
+                                titleStyle={[Styles.textRegular, Styles.textBold]}
+                                subtitleStyle={[Styles.textRegualrFontOnly]}
                                 onPress={(e) => {
                                     this._handleEnrolledStudentClicked(l.deviceId, e)
                                 }}
@@ -333,12 +347,14 @@ export default class ClassDetails extends Component {
     _renderUnLinkedStudents = () => {
         if (this.state.unlinkedStudents) {
             return (
-                <List containerStyle={[Styles.marignLRNone, { marginBottom: 20 }]}>
+                <List containerStyle={[Styles.marginNone, Styles.listMarginPaddingFix, {paddingLeft: 20, paddingRight: 20}]}>
                     {
                         this.state.unlinkedStudents.map((l, i) => (
                             <ListItem
                                 key={i}
                                 title={l}
+                                titleStyle={[Styles.textRegular, Styles.textBold]}
+                                subtitleStyle={[Styles.textRegualrFontOnly]}
                                 onPress={(e) => {
                                     this._handleUnlinkedStudentClicked(i, e);
                                 }}
@@ -381,7 +397,7 @@ export default class ClassDetails extends Component {
                                         name='times'
                                         type='font-awesome'
                                         color={Colors.headerTextIcons}
-                                        onPress={() => { this._handleDeleteStudentClicked() }} />
+                                        onPress={() => { this._handleDeleteClassClicked() }} />
                                 </View>
                             </View>
 
@@ -422,7 +438,9 @@ export default class ClassDetails extends Component {
 
                         <View style={[Styles.navbarLeft]}>
                             <Icon name="arrow-left" type="font-awesome"
-                                color={Colors.headerTextIcons} />
+                                color={Colors.headerTextIcons} 
+                                onPress={() => {this._handleBackButtonClicked()}}
+                                />
                         </View>
 
                         <Text style={[Styles.pageTitle]}>{this.state.classData.className}</Text>
@@ -441,49 +459,51 @@ export default class ClassDetails extends Component {
                         {this._rednerDetails()}
                     </ScrollView>
 
-                    <Modal isVisible={this.state.addStudentModal} style={Styles.bottomModal}>
-                        <View style={Styles.modalContent}>
-                            <HeadingText>Add student to class</HeadingText>
+                        <Modal isVisible={this.state.addStudentModal} style={Styles.bottomModal} avoidKeyboard={true}>
+                                <View style={Styles.modalContent}>
+                                <ScrollView>
+                                    <HeadingText>Add student to class</HeadingText>
 
-                            <View style={[{ flexDirection: 'row' }, Styles.marginB]}>
-                                <NormalInput placeholder="First Name" disabled={this.state.submitDisabled} 
-                                    value={this.state.firstName} style={{ flex: 1 }}
-                                    onChangeText={(text) => this._handleFirstNameInputChanged(text)} />
+                                    <View style={[{ flexDirection: 'row' }, Styles.marginB]}>
+                                        <NormalInput placeholder="First Name" disabled={this.state.submitDisabled}
+                                            value={this.state.firstName} style={{ flex: 1 }}
+                                            onChangeText={(text) => this._handleFirstNameInputChanged(text)} />
 
-                                <NormalInput placeholder="Last Name" disabled={this.state.submitDisabled}
-                                    value={this.state.lastName} style={{ flex: 1 }}
-                                    onChangeText={(text) => this._handleLastNameInputChanged(text)} />
-                            </View>
+                                        <NormalInput placeholder="Last Name" disabled={this.state.submitDisabled}
+                                            value={this.state.lastName} style={{ flex: 1 }}
+                                            onChangeText={(text) => this._handleLastNameInputChanged(text)} />
+                                    </View>
 
-                            <View style={[{alignItems: 'center'}]}>
-                                <NormalText style={[Styles.marginBSmall, Styles.textBold]}>Click the button below to scan the student's QR code to link the student to the class.</NormalText>
-                                <Icon
-                                    disabled={this.state.submitDisabled}
-                                    raised
-                                    reverse
-                                    size={50}
-                                    name='qrcode'
-                                    type='font-awesome'
-                                    color={Colors.positive}
-                                    onPress={() => { this._handleLinkStudentClicked() }} />
-                            </View>
+                                    <View style={[{ alignItems: 'center' }]}>
+                                        <NormalText style={[Styles.marginBSmall, Styles.textBold]}>Click the button below to scan the student's QR code to link the student to the class.</NormalText>
+                                        <Icon
+                                            disabled={this.state.submitDisabled}
+                                            raised
+                                            reverse
+                                            size={50}
+                                            name='qrcode'
+                                            type='font-awesome'
+                                            color={Colors.positive}
+                                            onPress={() => { this._handleLinkStudentClicked() }} />
+                                    </View>
 
-                            <View  style={[Styles.marginBSmall, Styles.marginTSmall]}>
-                                <NormalText>If you just want to add the student and scan the QR code later, press "Link Later".</NormalText>
-                            </View>
+                                    <View style={[Styles.marginBSmall, Styles.marginTSmall]}>
+                                        <NormalText>If you just want to add the student and scan the QR code later, press "Link Later".</NormalText>
+                                    </View>
 
-                            <View style={[{ flexDirection: 'row', justifyContent: 'space-between' }, Styles.marginT]}>
-                                <View style={[{ flex: 1 }]}>
-                                    <BlackButton style={[Styles.btnSmall]} disabled={this.state.submitDisabled}
-                                    text="Cancel" onPress={() => { this._handleCancelAddStudentClicked() }} />
+                                    <View style={[{ flexDirection: 'row', justifyContent: 'space-between' }, Styles.marginT]}>
+                                        <View style={[{ flex: 1 }]}>
+                                            <BlackButton style={[Styles.btnSmall]} disabled={this.state.submitDisabled}
+                                                text="Cancel" onPress={() => { this._handleCancelAddStudentClicked() }} />
+                                        </View>
+                                        <View style={[{ flex: 1 }]}>
+                                            <PrimaryDarkButton disabled={this.state.submitDisabled}
+                                                style={[Styles.btnSmall]} text="Link Later" onPress={() => { this._handleLinkStudentLaterClicked() }} />
+                                        </View>
+                                    </View>
+                                    </ScrollView>
                                 </View>
-                                <View style={[{ flex: 1 }]}>
-                                    <PrimaryDarkButton disabled={this.state.submitDisabled} 
-                                    style={[Styles.btnSmall]} text="Link Later" onPress={() => { this._handleLinkStudentLaterClicked() }} />
-                                </View>
-                            </View>
-                        </View>
-                    </Modal>
+                        </Modal>
 
                 </View>
             );

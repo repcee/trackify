@@ -9,6 +9,14 @@ import { NormalText, SubHeadingText, PrimaryDarkButton, AccentButton } from '../
 
 
 export default class PageWithHeaderandScrollView extends Component {
+
+    _handleSiginOutClicked = () => {
+        AuthService.signOutCurrentUser().then(mess => {
+        }).catch(err => {
+            alert("An error occurred.")
+        });
+    }
+    
     render() {
         return (
             <View style={[Styles.mainContainer]}>
@@ -25,6 +33,10 @@ export default class PageWithHeaderandScrollView extends Component {
                 <ScrollView>
                     <View style={[Styles.container, Styles.centerContents]}>
                         <SubHeadingText>Professor settings here.</SubHeadingText>
+
+                        <View style={[Styles.marginTLarge]}>
+                            <AccentButton text="Sigin Out" onPress={() => {this._handleSiginOutClicked()}} />
+                        </View>
                     </View>
                 </ScrollView>
 

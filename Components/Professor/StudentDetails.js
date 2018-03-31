@@ -52,6 +52,14 @@ export default class StudentDetails extends Component {
         });
     }
 
+    _handleBackButtonClicked = () => {
+        this.props.navigation.dispatch(
+            NavigationActions.back({
+                key: null
+            })
+        );
+    }
+
     _handleFirstNameInputChanged = (text) => {
         this.setState({
             firstName: text
@@ -181,7 +189,9 @@ export default class StudentDetails extends Component {
 
                         <View style={[Styles.navbarLeft]}>
                             <Icon name="arrow-left" type="font-awesome"
-                                color={Colors.headerTextIcons} />
+                                color={Colors.headerTextIcons} 
+                                onPress={() => {this._handleBackButtonClicked()}}                               
+                                />
                         </View>
 
                         <Text style={[Styles.pageTitle]}>Student Details</Text>

@@ -14,10 +14,7 @@ import { Styles, Colors, Defaults } from '../../config/AppTheme';
 
 
 export default class SignIn extends Component {
-    // Will hold reference to unregister authStateChangeListener.
-    // To be assigned in componentWillMount and invoked in componentWillUnmount.
-    authStateListenerUnsubscriber = null;
-
+   
     constructor(props) {
         super(props);
         this.state = {
@@ -60,22 +57,6 @@ export default class SignIn extends Component {
                     isLoading: false
                 });
             });
-    }
-
-    // Todo: redirect user to dashboard when authstate changes.
-    componentWillMount() {
-        authStateListenerUnsubscriber = AuthService.notifyOnAuthStateChanged((user) => {
-            if (user) {
-                alert("You are logged in. \nRedirecting you to your dashboard.");
-            } else {
-                console.log("auth: no user.")
-            }
-        });
-    }
-
-
-    componentWillUnmount() {
-        authStateListenerUnsubscriber();
     }
 
     handleSignUpClick = () => {

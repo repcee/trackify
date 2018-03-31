@@ -36,7 +36,6 @@ export default class AuthService {
         return new Promise((resolve, reject) => {
             FirebaseApp.auth().signInWithEmailAndPassword(email, password)
             .catch( (error) => {
-                console.log("si: ", Utils.formatFirebaseMessage(error.message));
                 reject(Utils.formatFirebaseMessage(error.message));
             });
         });
@@ -50,6 +49,13 @@ export default class AuthService {
         //         console.log("rej: ", Utils.formatFirebaseMessage(error.message));
         //         // reject(Utils.formatFirebaseMessage(error.message));
         // });
+    }
+
+    /**
+     * Students are logged in as anonymous users in firebase.
+     */
+    static async siginInStudent() {
+        await FirebaseApp.auth().signInAnonymously();
     }
 
     /**

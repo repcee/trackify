@@ -23,7 +23,7 @@ export default class UserTypePrompt extends Component {
 
 
     handleStudentClick = () => {
-        this.props.navigation.navigate("StudentNavigator");
+        this.props.navigation.navigate("StudentLoading");
     }
 
     handleProfessorClick = () => {
@@ -55,4 +55,4 @@ export default class UserTypePrompt extends Component {
             </View>
         );
     }
-}
+}   

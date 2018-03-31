@@ -36,13 +36,13 @@ export default class Home extends Component {
     // }
 
     componentWillMount() {
+
         const { width, height } = Dimensions.get('window');
         this.setState({ width, height });
-        setInterval(() => this.setState({circles: [...this.state.circles, 1]}), 2000);
+        setInterval(() => this.setState({ circles: [...this.state.circles, 1] }), 2000);
     }
 
     checkIn() {
-        console.log('checkin')
         this.setState({checkedIn: !this.state.checkedIn})
     }
 
