@@ -10,6 +10,8 @@ import SignIn from './SignIn';
 import UserTypePrompt from './UserTypePrompt';
 import Home from '../Professor/Home';
 import ProfessorNavigator from '../Professor/ProfessorNavigator';
+import StudentLoading from '../Student/StudentLoading';
+
 
 const routeConfigs = {
   SignUpScreen: {
@@ -31,7 +33,13 @@ const routeConfigs = {
     navigationOptions: {
       header: null
     }
-  }
+  },
+  StudentLoading: {
+    screen: StudentLoading,
+    navigationOptions: {
+        header: null
+    }
+},
 };
 
 const navigatorConfigs = {

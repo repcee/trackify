@@ -17,6 +17,7 @@ export default class Splash extends Component {
 			// If we have a firebase user and the user is not an anonymous user,
 			// then the user is a professor.
             if (user && !user.isAnonymous) {
+				console.log("You are a professor.");
 				this.props.navigation.navigate('ProfessorNavigator');
 			
 			// If we have a firebase user and the user IS an anonymous user,
@@ -27,6 +28,7 @@ export default class Splash extends Component {
 				this.props.navigation.navigate('StudentNavigator');
 			}
 			else {
+				console.log("No user detected.");
 				this.props.navigation.navigate('LoggedOutNavigator');
             }
         });

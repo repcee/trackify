@@ -52,11 +52,12 @@ const routeConfigs = {
         navigationOptions: {
             header: null
         }
-    }
+    },
+   
 };
 
 const navigatorConfigs = {
-    initialRouteName: 'Dashboard'
+    initialRouteName: 'Dashboard',
 };
 
 const StudentNavigator = StackNavigator(routeConfigs, navigatorConfigs);

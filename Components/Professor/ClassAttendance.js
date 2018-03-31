@@ -5,6 +5,7 @@ import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
 import moment from 'moment';
 import { Calendar, Agenda } from 'react-native-calendars';
+import { NavigationActions } from 'react-navigation';
 
 import { Styles, Colors } from '../../config/AppTheme';
 import { NormalText, SubHeadingText, PrimaryDarkButton, AccentButton, HeadingText } from '../UtilComponents';
@@ -23,7 +24,7 @@ export default class PageWithHeaderandScrollView extends Component {
 
         this.state = {
             isLoading: true,
-            isAttendanceLoading: true,
+            isAttendanceLoading: false,
             selectedDay: null,
 
             classId: this.props.navigation.getParam('classId'),
@@ -32,7 +33,7 @@ export default class PageWithHeaderandScrollView extends Component {
             formattedEnrolledStudents: this._generateFormattedListOfStudents(
                 classData.enrolledStudents
             )
-        }        
+        }
     }
 
     componentDidMount() {
@@ -62,11 +63,18 @@ export default class PageWithHeaderandScrollView extends Component {
     }
 
     _handelCalendarDayPressed = (date) => {
+        this.setState({
+            isAttendanceLoading: true
+        });
+
         const dayAsTimestamp = moment(date).format('x');
         const dayAsHumanStr = moment(date).format('LL');
-
-        let selectedDay = this.state.classData.attendance[`${dayAsTimestamp}`] || null;
+        let selectedDay = null;
         let enrolledStudents = Object.assign(this.state.formattedEnrolledStudents);
+
+        if(this.state.classData.attendance) {
+            selectedDay = this.state.classData.attendance[`${dayAsTimestamp}`];
+        }
 
         if (selectedDay !== null) {
             selectedDay.date = dayAsHumanStr;
@@ -79,7 +87,8 @@ export default class PageWithHeaderandScrollView extends Component {
 
         this.setState({
             selectedDay: selectedDay,
-            formattedEnrolledStudents: enrolledStudents
+            formattedEnrolledStudents: enrolledStudents,
+            isAttendanceLoading: false
         });
     }
 
@@ -112,12 +121,22 @@ export default class PageWithHeaderandScrollView extends Component {
         });
     }
 
-    _renderDetailsView = () => {
-        if (this.state.selectedDay) {
-            console.log("render ", this.state.selectedDay);
+    _handleBackButtonClicked = () => {
+        this.props.navigation.dispatch(
+            NavigationActions.back({
+                key: null
+            })
+        );
+    }
+
+    _renderDetailsView = () => {    
+
+        if (this.state.selectedDay !== null) {
             return (
                 <View>
-                    <HeadingText style={[Styles.marginBSmall]}>{this.state.selectedDay.date}</HeadingText>
+                    <HeadingText style={[Styles.marginBSmall]}>
+                        Attendance: <HeadingText style={[Styles.textColorPrimaryDark]}>{this.state.selectedDay.date}</HeadingText>
+                    </HeadingText>
                     <List containerStyle={[Styles.marginNone, Styles.listMarginPaddingFix]}>
                         {
                             Object.keys(this.state.formattedEnrolledStudents).map((i) => (
@@ -133,7 +152,7 @@ export default class PageWithHeaderandScrollView extends Component {
                                     }
                                     subtitle={`Marked as ${this.state.formattedEnrolledStudents[`${i}`].attendance.codeStr}`}
                                 />
-                            ))
+                            ))  
                         }
                     </List>
                 </View>
@@ -172,21 +191,33 @@ export default class PageWithHeaderandScrollView extends Component {
 
                         <View style={[Styles.navbarLeft]}>
                             <Icon name="arrow-left" type="font-awesome"
-                                color={Colors.headerTextIcons} />
+                                color={Colors.headerTextIcons} 
+                                onPress={() => {this._handleBackButtonClicked()}}
+                                />
                         </View>
 
-                        <Text style={[Styles.pageTitle]}>{this.state.classData.className} Attendance</Text>
+                        <Text style={[Styles.pageTitle]}>{this.state.classData.className}</Text>
 
                         <View style={Styles.navbarRight}>
                         </View>
                     </View>
                     <ScrollView>
                         <View style={[Styles.container]}>
+                        <View>
+                            <NormalText>Click on one of the highlighted dates to see the attendance record.</NormalText>
+                        </View>
                             <View style={[Styles.marginT]}>
                                 {this._renderCalenderView()}
                             </View>
                             
                             <View style={[Styles.marginT]}>
+                                {
+                                    this.state.isAttendanceLoading ? (
+                                        <View style={[Styles.centerContents, Styles.marginTLarge]}>
+                                            <ActivityIndicator size='large' color={Colors.primaryDark} />
+                                        </View>
+                                    ) : (null)
+                                }
                                 {this._renderDetailsView()}
                             </View>
                         </View>
