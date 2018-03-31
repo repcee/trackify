@@ -127,7 +127,7 @@ export default class Home extends Component {
                                             name='plus'
                                             type='font-awesome'
                                             color={Colors.black}
-                                            onPress={() => this._handleSignOutClick()} />
+                                            onPress={() => this._handleAddClassClick()} />
                                     </View>
                                 </View>
 
