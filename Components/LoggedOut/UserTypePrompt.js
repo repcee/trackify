@@ -23,8 +23,7 @@ export default class UserTypePrompt extends Component {
 
 
     handleStudentClick = () => {
-        // send to professor's dashboard.
-        this.props.navigation.navigate("SignUpScreen");
+        this.props.navigation.navigate("StudentNavigator");
     }
 
     handleProfessorClick = () => {

@@ -157,6 +157,10 @@ export const Styles = StyleSheet.create({
 		fontSize: Defaults.textSize,
 		lineHeight: 30,
 	},
+	textRegualrFontOnly: {
+		color: Colors.textColorRegular,
+		fontFamily: Defaults.fontFamilyRegular,
+	},
 	textHeading: {
 		color: Colors.textColorHeading,
 		fontFamily: Defaults.fontFamilyRegular,
@@ -280,5 +284,12 @@ export const Styles = StyleSheet.create({
 		alignItems: 'center',
 		borderRadius: 4,
 		borderColor: 'rgba(0, 0, 0, 0.1)',
+	},
+
+	// List Styles
+	listMarginPaddingFix: {
+		marginBottom: 20, 
+		paddingLeft: 40, 
+		paddingRight: 40
 	}
 });

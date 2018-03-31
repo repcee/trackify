@@ -52,7 +52,7 @@ export default class ClassDetails extends Component {
                     enrolledStudents: classDets.enrolledStudents ? Object.values(classDets.enrolledStudents).reverse() : [],
                     unlinkedStudents: classDets.unlinkedStudents || [],
 
-                    attendance: null,
+                    attendance: classDets.attendance,
 
                     isLoading: false,
                     indexInProfList: this.props.navigation.getParam('classData').indexInProfList
@@ -296,6 +296,16 @@ export default class ClassDetails extends Component {
         });
     }
 
+    /**
+     * Opens the class attendance screen.
+     */
+    _handleClassAttendanceClicked = () => {
+        this.props.navigation.navigate('ClassAttendance', {
+            classId: this.state.classId,
+            classData: this.state.classData
+        });
+    }
+
     _renderEnrolledStudents = () => {
         if (this.state.enrolledStudents) {
             return (
@@ -349,6 +359,31 @@ export default class ClassDetails extends Component {
         return (
             <View style={[Styles.container]}>
                 <NormalText>{this.state.classData.description}</NormalText>
+
+                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }]}>
+                                    <Icon
+                                        style={{ alignSelf: 'center' }}
+                                        raised
+                                        reverse
+                                        size={20}
+                                        name='calendar'
+                                        type='font-awesome'
+                                        color={Colors.positive}
+                                        onPress={() => { this._handleClassAttendanceClicked() }} />
+                                </View>
+
+                                <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'flex-start' }]}>
+                                    <Icon
+                                        raised
+                                        reverse
+                                        size={20}
+                                        name='times'
+                                        type='font-awesome'
+                                        color={Colors.headerTextIcons}
+                                        onPress={() => { this._handleDeleteStudentClicked() }} />
+                                </View>
+                            </View>
 
                  <View style={[{flex:2, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between'}]}>
                     <View style={[{ flex: 1 }]}>
