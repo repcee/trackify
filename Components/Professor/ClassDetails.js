@@ -63,7 +63,7 @@ export default class ClassDetails extends Component {
                         key: null
                     })
                 );
-                alert("Class not found");
+                alert("Class no longer exists");
             }
         });
     }
@@ -238,7 +238,8 @@ export default class ClassDetails extends Component {
     }
 
     _handleDeleteClassClicked = () => {
-        alert("Deleting class");
+        this.props.navigation.pop();
+        ClassService.deleteClass(this.state.classId);
     }
 
     _handleBackButtonClicked = () => {
