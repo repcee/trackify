@@ -54,6 +54,18 @@ export default class UserService {
     }
 
 
+    static async addNewUser(userDetails) {
+    const userRoot = this.getReferenceToUser();
+    return await userRoot.set(userDetails).then(() => {
+        return true;
+    }).catch((err) => {
+        console.log(err)
+        return false;
+    });
+
+    }
+
+
     static async updateUser(userId, updateData) {
         const userRef = this.getReferenceToUser(userId);
         return await userRef.update(updateData, (err) => {
