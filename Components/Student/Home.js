@@ -4,6 +4,8 @@ import { Button, Input } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DeviceInfo from 'react-native-device-info';
 import DeviceService from '../../Services/DeviceService';
+import ClassService from '../../Services/ClassService';
+import moment from 'moment';
 import Pulse from './Pulse';
 import Modal from 'react-native-modal';
 import QRCode from 'react-native-qrcode';
@@ -20,28 +22,74 @@ export default class Home extends Component {
             width: undefined,
             checkedIn: false,
             circles: [],
-            toggleViewDeviceInfo: false
+            toggleViewDeviceInfo: false,
+
+            shouldCheckTime: false,
+            soonClasses: [],
         };
     }
 
-    componentWillMount() {
-       
+    _IsActiveClass = (startDate, endDate, startTime, endTime, classDets) => {
+        let currDT = moment();
+        let currentTime =  moment(currDT, 'hh:mm A');
+        const timeDiff = startTime.diff(currentTime, 'minutes');
+
+        const isActive = moment(moment()).isBetween(startDate, endDate);
+    
+        
+        const meetingDays = this._getClassMeetingTimes(classDets.meetingDays);
+
+        const shouldCheck = isActive && (timeDiff > 0 && timeDiff <= 120) && (meetingDays.includes(currDT.format('dddd')));
+
+        this.setState({
+            shouldCheckTime: shouldCheck
+        });
+
+        return shouldCheck;
+
     }
 
-    // componentDidMount() {
-    //     navigator.geolocation.getCurrentPosition(
-    //       (position) => {
-    //         console.log(position);
-    //         this.setState({
-    //           latitude: position.coords.latitude,
-    //           longitude: position.coords.longitude,
-    //           error: null,
-    //         });
-    //       },
-    //       (error) => this.setState({ error: error.message }),
-    //       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
-    //     );
-    // }
+    _getClassMeetingTimes = (daysArray) => {
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        let classDays = [];
+
+        for(let i = 0; i < days.length; i++) {
+            if (daysArray[i]) {
+                classDays.push(days[i]);
+            } 
+        }
+        return classDays;
+    }
+
+    _findClassesToday = () => {
+
+        if (this.state.deviceData) {
+            for(_class in this.state.deviceData.classesEnrolled) {
+                ClassService.getClass(_class, (res) => {
+                    console.log("RES: ", res)
+                    let startDate = moment(res.startDate);
+                    let endDate = moment(res.endDate);
+
+                    let startTime = moment(res.startTime,  ['hh:mm A', 'HH:mm A']);
+                    let endTime = moment(res.endTime,  ['hh:mm A', 'HH:mm A']);
+
+                    let currentDateTime = moment();
+
+                    if (this._IsActiveClass(startDate, endDate, startTime, endTime, res)) {
+                        console.log("this class");
+                        let sclasses = this.state.soonClasses.splice();
+                        sclasses.push(res);
+
+                        this.setState({
+                            soonClasses: sclasses
+                        });
+
+                    }
+
+                });
+            }
+        }
+    }
 
     componentWillMount() {
         const { width, height } = Dimensions.get('window');
@@ -53,7 +101,6 @@ export default class Home extends Component {
                     createdAt: Date.now(),
                     updatedAt: Date.now(),
                 }).then(mess => {
-
                 }).catch(err => {
                     alert("An error occurred.");
                 });
@@ -65,9 +112,27 @@ export default class Home extends Component {
                 width: width,
                 height: height
             });
+
+            this._findClassesToday();
         });
 
-        setInterval(() => this.setState({ circles: [...this.state.circles, 1] }), 2000);
+        console.log(this.state);
+        if(this.state.shouldCheckTime) {
+            console.log("OKay immm");
+        }
+        setInterval(() => {
+            // console.log(this.state.soonClasses);
+            // for (_class in this.state.soonClasses) {
+            //     let currentTime =  moment(moment(), 'hh:mm A');
+            //     let startTime = moment(this.state.soonClasses[_class].startTime,  ['hh:mm A', 'HH:mm A']);
+            //     let endTime = moment(this.state.soonClasses[_class].endTime,  ['hh:mm A', 'HH:mm A']);
+
+            //     console.log("Time bet: ", currentTime.isBetween(startTime, endTime));
+
+            // }
+
+            this.setState({ circles: [...this.state.circles, 1] });
+        }, 2000);
     }
 
     checkIn() {
