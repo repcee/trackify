@@ -3,6 +3,7 @@ import { Dimensions, StyleSheet, Text, View, Image, ImageBackground, TouchableWi
 import { Button, Input } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DeviceInfo from 'react-native-device-info';
+import DeviceService from '../../Services/DeviceService';
 import Pulse from './Pulse';
 import Modal from 'react-native-modal';
 import QRCode from 'react-native-qrcode';
@@ -12,12 +13,19 @@ export default class Home extends Component {
     constructor() {
         super();
         this.state = {
+            deviceInfo: DeviceInfo.getUniqueID(),
+            isLoading: true,
+            deviceData: null,
             height: undefined,
             width: undefined,
             checkedIn: false,
             circles: [],
             toggleViewDeviceInfo: false
         };
+    }
+
+    componentWillMount() {
+       
     }
 
     // componentDidMount() {
@@ -36,9 +44,29 @@ export default class Home extends Component {
     // }
 
     componentWillMount() {
-
         const { width, height } = Dimensions.get('window');
-        this.setState({ width, height });
+
+        DeviceService.getDevice(this.state.deviceInfo, (res) => {
+            if (res == null) {
+                DeviceService.addDevice({
+                    deviceId: this.state.deviceInfo,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
+                }).then(mess => {
+
+                }).catch(err => {
+                    alert("An error occurred.");
+                });
+            }
+            this.setState({
+                isLoading: false,
+                deviceData: res,
+
+                width: width,
+                height: height
+            });
+        });
+
         setInterval(() => this.setState({ circles: [...this.state.circles, 1] }), 2000);
     }
 

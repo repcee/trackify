@@ -20,8 +20,8 @@ export default class DeviceService {
     }
 
     static async addDevice(deviceDetails) {
-        const devicesRootRef = this.getReferenceToDevicesRoot();
-        const addDeviceRes = await devicesRootRef.push(deviceDetails);
+        const devicesRootRef = this.getReferenceToDevice(deviceDetails.deviceId);
+        const addDeviceRes = await devicesRootRef.set(deviceDetails);
         return addDeviceRes !== null;
     }
 

@@ -4,8 +4,8 @@ import { TabNavigator, StackNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Home from './Home'
 import Settings from './Settings';
-// import Attendance from './Attendance';
-// import Student from './Student';
+import Classes from './Classes';
+import Attendance from './Attendance';
 
 const Dashboard = TabNavigator({
     Home: {
@@ -17,6 +17,15 @@ const Dashboard = TabNavigator({
             tabBarIcon: ({ tintColor }) => <Icon name="home" color={tintColor} size={24} />
         }
     },
+    Classes: {
+        screen: Classes,
+        navigationOptions: {
+            headerStyle: { marginTop: (Platform.OS === 'ios') ? 0 : 0 },
+            headerTitle: 'Classes',
+            tabBarIcon: ({ tintColor }) => <Icon name="list" color={tintColor} size={24} />
+        }
+    },
+    
     Settings: {
         screen: Settings,
         navigationOptions: {
@@ -53,6 +62,13 @@ const routeConfigs = {
             header: null
         }
     },
+    Attendance: {
+        screen: Attendance,
+        navigationOptions: {
+            header: null
+        }
+    },
+    
    
 };
 
