@@ -4,7 +4,7 @@ import { Button, Icon, List, ListItem } from 'react-native-elements';
 import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
 import moment from 'moment';
-import { Calendar, Agenda } from 'react-native-calendars';
+import { Calendar } from 'react-native-calendars';
 import { NavigationActions } from 'react-navigation';
 
 import { Styles, Colors } from '../../config/AppTheme';
@@ -78,10 +78,18 @@ export default class PageWithHeaderandScrollView extends Component {
 
         if (selectedDay !== null) {
             selectedDay.date = dayAsHumanStr;
+            
+            for (student in  enrolledStudents) {
+                let stdInList = selectedDay.students[student];
 
-            for (student in  selectedDay.students) {
-                enrolledStudents[student].attendance = 
+                if (stdInList) {
+                    enrolledStudents[student].attendance = 
                     this._getAttendanceStatus(selectedDay.students[student].attendanceStatus);
+                } else {
+                    enrolledStudents[student].attendance = 
+                    this._getAttendanceStatus('a');
+                }
+               
             }
         }
 
