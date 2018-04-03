@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, View, Image, ImageBackground, TouchableWithoutFeedback, Animated, Easing, PermissionsAndroid} from 'react-native';
+import { Dimensions, StyleSheet, Text, View, Image, ImageBackground, TouchableWithoutFeedback, Animated, Easing, YellowBox, PermissionsAndroid} from 'react-native';
 import { Button, Input } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DeviceInfo from 'react-native-device-info';
@@ -14,6 +14,9 @@ export default class Home extends Component {
 
     constructor() {
         super();
+        YellowBox.ignoreWarnings(['Setting a timer']);
+        YellowBox.ignoreWarnings(['Deprecation warning']);
+        YellowBox.ignoreWarnings(['Possible Unhandled Promise Rejection']);
         this.state = {
             deviceInfo: DeviceInfo.getUniqueID(),
             isLoading: true,
@@ -21,11 +24,13 @@ export default class Home extends Component {
             height: undefined,
             width: undefined,
             checkedIn: false,
+            checkinDisabled: true,
             circles: [],
             toggleViewDeviceInfo: false,
 
             shouldCheckTime: false,
             soonClasses: [],
+            classId: undefined
         };
     }
 
@@ -128,6 +133,13 @@ export default class Home extends Component {
     componentWillMount() {
         const { width, height } = Dimensions.get('window');
 
+        ClassService.getClassWithTime(this.state.deviceInfo).then(classId => {
+            this.setState({ checkinDisabled: !classId, classId });
+            ClassService.checkIfAlreadyCheckedIn(classId, this.state.deviceInfo).then(res => {
+                this.setState({checkedIn: res});
+            });
+        });
+
         DeviceService.getDevice(this.state.deviceInfo, (res) => {
             if (res == null) {
                 DeviceService.addDevice({
@@ -152,7 +164,7 @@ export default class Home extends Component {
             this._getUsersCurrentLocation();
         });
 
-        console.log(this.state);
+        // console.log(this.state);
         if(this.state.shouldCheckTime) {
             console.log("OKay immm");
         }
@@ -161,8 +173,23 @@ export default class Home extends Component {
         }, 2000);
     }
 
+    refresh() {
+        ClassService.getClassWithTime(this.state.deviceInfo)
+            .then(classId => {
+                this.setState({ checkinDisabled: !classId, classId });
+            })
+            .catch(err => {
+                this.setState({ checkinDisabled: true });
+            });
+    }
+
     checkIn() {
-        this.setState({checkedIn: !this.state.checkedIn})
+        if(this.state.classId && !this.state.checkedIn) {
+            ClassService.classCheckIn(this.state.classId, this.state.deviceInfo);
+            if (!this.state.checkinDisabled) {
+                this.setState({checkedIn: !this.state.checkedIn});
+            }
+        }
     }
 
     render() {
@@ -178,17 +205,21 @@ export default class Home extends Component {
                         {
                             this.state.checkedIn ?
                                 <Icon name='check' size={75} color='#7DD892' /> :
-                                <Image source={require('../../Assets/trackify-logo2.png')} style={{height: 100, width: 100}}/>
+                                    this.state.checkinDisabled ?
+                                        <Icon name='close' size={80} color='rgb(234, 98, 121)' /> :
+                                        <Image source={require('../../Assets/trackify-logo2.png')} style={{height: 100, width: 100}}/>
                         }
                     </View>
                     </TouchableWithoutFeedback>
-                    {!this.state.checkedIn && this.state.circles.map((circle, i) => <Pulse key={i}/>)}
+                    {!this.state.checkedIn && !this.state.checkinDisabled && this.state.circles.map((circle, i) => <Pulse key={i}/>)}
                 </View>
                 <View style={{flex: 1}}>
                     {
                         this.state.checkedIn ?
                             <Text style={{fontSize: 18}}>You have successfully checked in to class</Text> :
-                            <Text style={{fontSize: 18}}>You have not yet checked in to class</Text>
+                            this.state.checkinDisabled ? 
+                                <Text style={{fontSize: 18}}>You do not have any classes during current time</Text> :
+                                <Text style={{fontSize: 18}}>You have not yet checked in to class</Text>
                     }
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
@@ -196,7 +227,7 @@ export default class Home extends Component {
                         <Icon name='tablet' size={35} onPress={() => this.setState({toggleViewDeviceInfo: true})} />
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
-                        <Icon name='info-circle' size={35} />
+                        <Icon name='refresh' size={35} onPress={() => this.refresh()} />
                     </View>
                 </View>
                 <Modal
