@@ -70,6 +70,7 @@ export default class PageWithHeaderandScrollView extends Component {
         const dayAsTimestamp = moment(date).format('x');
         const dayAsHumanStr = moment(date).format('LL');
         let selectedDay = null;
+
         let enrolledStudents = Object.assign(this.state.formattedEnrolledStudents);
 
         if(this.state.classData.attendance && this.state.classData.attendance[`${dayAsTimestamp}`]) {
@@ -88,8 +89,7 @@ export default class PageWithHeaderandScrollView extends Component {
                 } else {
                     enrolledStudents[student].attendance = 
                     this._getAttendanceStatus('a');
-                }
-               
+                }               
             }
         }
 

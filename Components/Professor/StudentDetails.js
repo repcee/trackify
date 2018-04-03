@@ -155,10 +155,29 @@ export default class StudentDetails extends Component {
             'Are you sure you want to unregister this student?',
             [
                 { text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                { text: 'Yes', onPress: () => console.log('OK Pressed') },
+                { text: 'Yes', onPress: () => this._removeStudentFromClass() },
             ],
             { cancelable: false }
         )
+    }
+
+
+    _removeStudentFromClass = () => {
+        ClassService.addEditEnrolledStudentToClass({
+                deviceId: this.state.deviceId,
+                classId: this.state.classId,
+            }, 'delete').then(res => {
+                console.log("LAST##$@@#@", res);
+            if (res) {
+                this.props.navigation.dispatch(
+                    NavigationActions.back({
+                        key: null
+                    })
+                );
+            }else{
+                alert("An error occurred.")
+            }
+    });
     }
 
 

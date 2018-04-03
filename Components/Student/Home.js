@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, View, Image, ImageBackground, TouchableWithoutFeedback, Animated, Easing } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, Image, ImageBackground, TouchableWithoutFeedback, Animated, Easing, PermissionsAndroid} from 'react-native';
 import { Button, Input } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DeviceInfo from 'react-native-device-info';
@@ -91,6 +91,40 @@ export default class Home extends Component {
         }
     }
 
+    _requestLocationPermissions = async () => {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                {
+                    'title': 'Location Permission',
+                    'message': 'Trackify needs to accesses your location.'
+                }
+            )
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (err) {
+            console.warn(err)
+            return false;
+        }
+    }
+    
+    _getUsersCurrentLocation = () => {
+        this._requestLocationPermissions().then(res => {
+            if (res) {
+                console.log("Persmission granted.");
+                navigator.geolocation.getCurrentPosition(pos => {
+                    console.log("CURURUUE: ", pos);
+                });
+            } else {
+                console.log("Denied.")
+            }
+        })
+    }
+
+
     componentWillMount() {
         const { width, height } = Dimensions.get('window');
 
@@ -114,6 +148,8 @@ export default class Home extends Component {
             });
 
             this._findClassesToday();
+
+            this._getUsersCurrentLocation();
         });
 
         console.log(this.state);
@@ -121,16 +157,6 @@ export default class Home extends Component {
             console.log("OKay immm");
         }
         setInterval(() => {
-            // console.log(this.state.soonClasses);
-            // for (_class in this.state.soonClasses) {
-            //     let currentTime =  moment(moment(), 'hh:mm A');
-            //     let startTime = moment(this.state.soonClasses[_class].startTime,  ['hh:mm A', 'HH:mm A']);
-            //     let endTime = moment(this.state.soonClasses[_class].endTime,  ['hh:mm A', 'HH:mm A']);
-
-            //     console.log("Time bet: ", currentTime.isBetween(startTime, endTime));
-
-            // }
-
             this.setState({ circles: [...this.state.circles, 1] });
         }, 2000);
     }

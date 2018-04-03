@@ -149,6 +149,7 @@ export default class SchoolLocation extends Component {
                 });
 
                 if (res == 'undefinded' || res.length < 1) {
+                    console.log(res);
                     alert('Address not found. Try again.');
                 } else {
                     this.setState({

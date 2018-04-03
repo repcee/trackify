@@ -26,13 +26,24 @@ export default class DeviceService {
     }
 
   
-    static async addEditDeviceClassesEnrolled(deviceId, classId, classData) {
+    static async addEditDeviceClassesEnrolled(deviceId, classId, classData, mode = 'addEdit') {
+        
         const enrolledClassRoot = this.getReferenceToDevice(deviceId).child(`/classesEnrolled/${classId}`);
-        return await enrolledClassRoot.set(classData).then(() => {
-            return true;
-        }).catch((err) => {
-            return false;
-        });
+
+        if (mode === 'delete') {
+            return await enrolledClassRoot.remove().then(() => {
+                return true;
+            }).catch((err) => {
+                return false;
+            });
+        } else {
+            return await enrolledClassRoot.set(classData).then(() => {
+                return true;
+            }).catch((err) => {
+                return false;
+            });
+        }
+       
     }
 
 

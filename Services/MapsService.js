@@ -12,7 +12,8 @@ export default class MapsService {
             + `&key=${googleMaps.apiKey}`;
 
         try {
-            let response = await fetch(fetchUrl);
+            console.log(fetchUrl);
+            let response = await fetch(fetchUrl);   
             let responseJson = await response.json();
             return responseJson.results;
         } catch (error) {

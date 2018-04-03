@@ -86,32 +86,48 @@ export default class ClassService {
             }).then(() => {
                 return true;
             }).catch((err) => {
+                console.log(err);
                 return false;
             });
         }
     }
 
-
-    static async addEditEnrolledStudentToClass(details) {
-
-        const enrolledStudentRoot = this.getReferenceToClass(details.classId).child(`/enrolledStudents/${details.deviceId}`);
-
-        const {className, classId, ...studentDetails} = details;
-
-        const result = await enrolledStudentRoot.set(studentDetails);
-
-        if (result !== null) {
-            // add/update the class info under the appropriate device root.
-            DeviceService.addEditDeviceClassesEnrolled(details.deviceId, details.classId, {
-                classId: details.classId,
-                className: details.className,
-                dateEnrolled: details.createdAt
-            }).then(() => {
-                return true;
-            }).catch((err) => {
+    static async addEditEnrolledStudentToClass(details, mode='addEdit') {
+        const enrolledDeviceRoot = this.getReferenceToClass(details.classId).child(`/enrolledStudents/${details.deviceId}`);
+        if (mode === 'delete') {
+            return await enrolledDeviceRoot.remove().then(() => {
+                return DeviceService.addEditDeviceClassesEnrolled(details.deviceId, details.classId, {}, 'delete').then(() => {
+                    return true;
+                }).catch((err) => {
+                    console.log(err);
+                    return false;
+                });
+            }).catch(err => {
+                console.log(err);
                 return false;
             });
+         
+        } else {
+            const { className, classId, ...studentDetails } = details;
+
+            const result = await enrolledDeviceRoot.set(studentDetails);
+
+            if (result !== null) {
+                // add/update the class info under the appropriate device root.
+                DeviceService.addEditDeviceClassesEnrolled(details.deviceId, details.classId, {
+                    classId: details.classId,
+                    className: details.className,
+                    dateEnrolled: details.createdAt
+                }).then(() => {
+                    return true;
+                }).catch((err) => {
+                    console.log(err);
+                    return false;
+                });
+            }
         }
+
+       
     }
 
     static async updateEnrolledStudentData(details) {
