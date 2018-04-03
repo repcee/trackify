@@ -30,7 +30,12 @@ export default class Home extends Component {
 
             shouldCheckTime: false,
             soonClasses: [],
-            classId: undefined
+            classId: undefined,
+            className: undefined,
+            locationError: false,
+            longitude: undefined,
+            latitude: undefined,
+            currentTime: moment().subtract(4, 'hours').format('hh:mm A')
         };
     }
 
@@ -120,9 +125,15 @@ export default class Home extends Component {
         this._requestLocationPermissions().then(res => {
             if (res) {
                 console.log("Persmission granted.");
-                navigator.geolocation.getCurrentPosition(pos => {
-                    console.log("CURURUUE: ", pos);
-                });
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        console.log("CURURUUE: ", pos);
+                        this.setState({longitude: pos.coords.longitude, latitude: pos.coords.latitude})
+                    },
+                    error => {
+                        this.setState({locationError: true});
+                        console.log('error');
+                    });
             } else {
                 console.log("Denied.")
             }
@@ -133,11 +144,19 @@ export default class Home extends Component {
     componentWillMount() {
         const { width, height } = Dimensions.get('window');
 
-        ClassService.getClassWithTime(this.state.deviceInfo).then(classId => {
-            this.setState({ checkinDisabled: !classId, classId });
-            ClassService.checkIfAlreadyCheckedIn(classId, this.state.deviceInfo).then(res => {
-                this.setState({checkedIn: res});
+        this.timeInterval = setInterval(() => {
+            this.setState({
+              currentTime: moment().subtract(4, 'hours').format('hh:mm A')
             });
+          }, 30000);
+
+        ClassService.getClassWithTime(this.state.deviceInfo).then(classInfo => {
+            if(classInfo) {
+                this.setState({ checkinDisabled: !classInfo.classId, classId: classInfo.classId, className: classInfo.className });
+                ClassService.checkIfAlreadyCheckedIn(classInfo.classId, this.state.deviceInfo).then(res => {
+                    this.setState({checkedIn: res});
+                });
+            }
         });
 
         DeviceService.getDevice(this.state.deviceInfo, (res) => {
@@ -175,8 +194,10 @@ export default class Home extends Component {
 
     refresh() {
         ClassService.getClassWithTime(this.state.deviceInfo)
-            .then(classId => {
-                this.setState({ checkinDisabled: !classId, classId });
+            .then(classInfo => {
+                if (classInfo) {
+                    this.setState({ checkinDisabled: !classInfo.classId, classId: classInfo.classId, className: classInfo.className });
+                }
             })
             .catch(err => {
                 this.setState({ checkinDisabled: true });
@@ -200,6 +221,7 @@ export default class Home extends Component {
         return (
             <View style={styles.mainContainer}>
                 <View style={styles.topContainer}>
+                <Text style={{position: 'absolute', right: 20, top: 20, fontSize: 16}}>{this.state.currentTime}</Text>
                 <TouchableWithoutFeedback onPress={() => this.checkIn()} style={{zIndex: 1}}>
                     <View style={styles.checkInButton}>
                         {
@@ -213,13 +235,13 @@ export default class Home extends Component {
                     </TouchableWithoutFeedback>
                     {!this.state.checkedIn && !this.state.checkinDisabled && this.state.circles.map((circle, i) => <Pulse key={i}/>)}
                 </View>
-                <View style={{flex: 1}}>
+                <View style={{flex: 1, paddingHorizontal: 10}}>
                     {
                         this.state.checkedIn ?
-                            <Text style={{fontSize: 18}}>You have successfully checked in to class</Text> :
+                            <Text style={{fontSize: 18}}>You have successfully checked in to {this.state.className}.</Text> :
                             this.state.checkinDisabled ? 
-                                <Text style={{fontSize: 18}}>You do not have any classes during current time</Text> :
-                                <Text style={{fontSize: 18}}>You have not yet checked in to class</Text>
+                                <Text style={{fontSize: 18, textAlign:'center'}}>You do not have any classes during current time.</Text> :
+                                <Text style={{fontSize: 18}}>You have not yet checked in to {this.state.className}.</Text>
                     }
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 25, alignItems: 'center'}}>
@@ -246,6 +268,18 @@ export default class Home extends Component {
                                         bgColor='black'
                                         fgColor='white'/>
                                 </View>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+                <Modal
+                    isVisible={this.state.locationError}
+                    onBackdropPress={() => this.setState({locationError: false})}>
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={styles.errorModalContainer}>
+                            <View style={{flex: 1, alignSelf: 'stretch', alignItems: 'flex-end', margin: 10}}><Icon name='close' size={25} onPress={() => this.setState({toggleViewDeviceInfo: false})} /></View>
+                            <View style={{flex: 6, alignItems: 'center'}}>
+                                <Text style={{fontSize: 18, textAlign: 'center'}}>Your location is currently not enabled!</Text>
                             </View>
                         </View>
                     </View>
@@ -282,6 +316,14 @@ const styles = StyleSheet.create({
     modalContainer: {
         backgroundColor: 'white',
         height: 375,
+        width: 300,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    errorModalContainer: {
+        backgroundColor: 'white',
+        height: 250,
         width: 300,
         borderRadius: 10,
         justifyContent: 'center',

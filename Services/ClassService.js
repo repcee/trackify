@@ -43,10 +43,11 @@ export default class ClassService {
 
     static getClassWithTime(deviceId) {
         var classId;
+        var className;
         return new Promise((resolve, reject) => {
             FirebaseApp.database().ref(`/devices/${deviceId}`).once('value', snapshot => {
-                const classesEnrolled = Object.keys(snapshot.val().classesEnrolled);
-                const currentTime = moment();
+                const classesEnrolled = snapshot.val().classesEnrolled && Object.keys(snapshot.val().classesEnrolled);
+                const currentTime = moment().subtract(4, 'hours');
                 const classRef = this.getReferenceToClassesRoot();
                     classRef.once('value', snapshot => {
                         snapshot.forEach(classSnapshot => {
@@ -60,9 +61,10 @@ export default class ClassService {
                             const isValidCheckin = moment(currentTime.format('hh:mm:ss A'), 'hh:mm A').isBetween(moment(startTime, 'hh:mm:ss A'), moment(startTime, 'hh:mm:ss A').add(checkInGracePeriodMinutes, 'minutes')); 
                             if (isValidCheckin && classesEnrolled.includes(classSnapshot.key) && daysOfClass.includes(dow)) {
                                 classId = classSnapshot.key;
+                                className = classSnapshot.val().className;
                             }
                         });
-                        !!classId ? resolve(classId) : reject(undefined);
+                        !!classId ? resolve({classId, className}) : reject(undefined);
                     });
             });
         })
