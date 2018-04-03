@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, YellowBox } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
@@ -14,6 +14,10 @@ export default class UserTypePrompt extends Component {
     authStateListenerUnsubscriber = null;
 
     constructor(props) {
+        YellowBox.ignoreWarnings(['Setting a timer']);
+        YellowBox.ignoreWarnings(['Warning: Can only update a mounted or mounting component.']);
+        YellowBox.ignoreWarnings(['Deprecation warning']);
+        YellowBox.ignoreWarnings(['Possible Unhandled Promise Rejection']);
         super(props);
         this.state = {
             isLoading: false,

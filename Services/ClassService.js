@@ -47,7 +47,8 @@ export default class ClassService {
         return new Promise((resolve, reject) => {
             FirebaseApp.database().ref(`/devices/${deviceId}`).once('value', snapshot => {
                 const classesEnrolled = snapshot.val().classesEnrolled && Object.keys(snapshot.val().classesEnrolled);
-                const currentTime = moment().subtract(4, 'hours');
+                // const currentTime = moment().subtract(4, 'hours');
+                const currentTime = moment();
                 const classRef = this.getReferenceToClassesRoot();
                     classRef.once('value', snapshot => {
                         snapshot.forEach(classSnapshot => {

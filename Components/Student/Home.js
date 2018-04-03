@@ -35,7 +35,8 @@ export default class Home extends Component {
             locationError: false,
             longitude: undefined,
             latitude: undefined,
-            currentTime: moment().subtract(4, 'hours').format('hh:mm A')
+            // currentTime: moment().subtract(4, 'hours').format('hh:mm A')
+            currentTime: moment().format('hh:mm A')
         };
     }
 
@@ -146,7 +147,8 @@ export default class Home extends Component {
 
         this.timeInterval = setInterval(() => {
             this.setState({
-              currentTime: moment().subtract(4, 'hours').format('hh:mm A')
+            //   currentTime: moment().subtract(4, 'hours').format('hh:mm A')
+              currentTime: moment().format('hh:mm A')
             });
           }, 30000);
 

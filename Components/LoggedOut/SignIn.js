@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, ActivityIndicator, TextInput, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { Text, View, ActivityIndicator, TextInput, KeyboardAvoidingView, ScrollView, YellowBox } from 'react-native';
 import { Button, Icon, Input } from 'react-native-elements';
 import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
@@ -17,6 +17,10 @@ export default class SignIn extends Component {
    
     constructor(props) {
         super(props);
+        YellowBox.ignoreWarnings(['Setting a timer']);
+        YellowBox.ignoreWarnings(['Warning: Can only update a mounted or mounting component.']);
+        YellowBox.ignoreWarnings(['Deprecation warning']);
+        YellowBox.ignoreWarnings(['Possible Unhandled Promise Rejection']);
         this.state = {
             isLoading: false,
             inputEmail: null,
