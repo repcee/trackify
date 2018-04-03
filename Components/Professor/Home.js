@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { Text, View, ScrollView, StyleSheet, ActivityIndicator, YellowBox } from 'react-native';
 import { Button, Icon, List, ListItem } from 'react-native-elements';
 import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
@@ -27,6 +27,8 @@ export default class Home extends Component {
     
     constructor(props) {
         super(props);
+
+        YellowBox.ignoreWarnings(['Setting a timer']);
 
         this.state = {
             isLoading: true,
