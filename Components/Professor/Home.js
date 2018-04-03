@@ -29,6 +29,10 @@ export default class Home extends Component {
         super(props);
 
         YellowBox.ignoreWarnings(['Setting a timer']);
+        YellowBox.ignoreWarnings(['Warning: Can only update a mounted or mounting component.']);
+        YellowBox.ignoreWarnings(['Deprecation warning']);
+        YellowBox.ignoreWarnings(['Possible Unhandled Promise Rejection']);
+
 
         this.state = {
             isLoading: true,
