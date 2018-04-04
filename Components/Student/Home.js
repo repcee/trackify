@@ -9,6 +9,7 @@ import moment from 'moment';
 import Pulse from './Pulse';
 import Modal from 'react-native-modal';
 import QRCode from 'react-native-qrcode';
+import MapsService from '../../Services/MapsService';
 
 export default class Home extends Component {
 
@@ -102,44 +103,22 @@ export default class Home extends Component {
         }
     }
 
-    _requestLocationPermissions = async () => {
-        try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-                {
-                    'title': 'Location Permission',
-                    'message': 'Trackify needs to accesses your location.'
-                }
-            )
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                return true;
+    _getUsersCurrentLocation = () => {
+        MapsService.getUsersCurrentLocation((res) => {
+            if (res !== null) {
+                this.setState({
+                    latitude: res.coords.latitude,
+                    longitude: res.coords.longitude
+                });
             } else {
-                return false;
+                this.setState({
+                    locationError: true
+                })
             }
-        } catch (err) {
-            console.warn(err)
-            return false;
-        }
+        });
     }
     
-    _getUsersCurrentLocation = () => {
-        this._requestLocationPermissions().then(res => {
-            if (res) {
-                console.log("Persmission granted.");
-                navigator.geolocation.getCurrentPosition(
-                    pos => {
-                        console.log("CURURUUE: ", pos);
-                        this.setState({longitude: pos.coords.longitude, latitude: pos.coords.latitude})
-                    },
-                    error => {
-                        this.setState({locationError: true});
-                        console.log('error');
-                    });
-            } else {
-                console.log("Denied.")
-            }
-        })
-    }
+    
 
 
     componentWillMount() {

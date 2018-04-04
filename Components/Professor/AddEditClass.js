@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, KeyboardAvoidingView, TouchableOpacity, DatePickerAndroid, TimePickerAndroid } from 'react-native';
+import { Text, View, ScrollView, KeyboardAvoidingView, TouchableOpacity, DatePickerAndroid, TimePickerAndroid, PermissionsAndroid } from 'react-native';
 import { Button, Icon, CheckBox } from 'react-native-elements';
 import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
@@ -36,8 +36,8 @@ export default class AddEditClass extends Component {
 
                 // These addess details are being used now.
                 classAddressString: null,
-                classLatitude: 33.7531,
-                classLongitude: 84.3853,
+                classLatitude: null,
+                classLongitude: null,
 
                 timezone: 'EST',
 
@@ -87,6 +87,7 @@ export default class AddEditClass extends Component {
         authStateListenerUnsubscriber();
     }
 
+   
     /**
      * Responds to the user clicking the back icon in the navbar
      */

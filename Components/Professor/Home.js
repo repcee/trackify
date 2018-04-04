@@ -3,6 +3,7 @@ import { Text, View, ScrollView, StyleSheet, ActivityIndicator, YellowBox } from
 import { Button, Icon, List, ListItem } from 'react-native-elements';
 import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
+import MapsService from '../../Services/MapsService';
 
 import { Styles, Colors } from '../../config/AppTheme';
 import { NormalText, SubHeadingText, PrimaryDarkButton, AccentButton, HeadingText } from '../UtilComponents';
@@ -42,6 +43,11 @@ export default class Home extends Component {
 
     }
 
+    _getUsersCurrentLocation = () => {
+        MapsService.getUsersCurrentLocation((res) => {
+        });
+    }
+
     componentWillMount() {
         authStateListenerUnsubscriber = AuthService.notifyOnAuthStateChanged((user) => {
             if (user) {
@@ -59,6 +65,8 @@ export default class Home extends Component {
                 console.log("auth: no user.")
             }
         });
+
+        this._getUsersCurrentLocation();
     }
 
     _handleAddClassClick = () => {

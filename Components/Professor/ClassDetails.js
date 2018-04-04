@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, ActivityIndicator, KeyboardAvoidingView} from 'react-native';
+import { Text, View, ScrollView, ActivityIndicator, KeyboardAvoidingView, PermissionsAndroid} from 'react-native';
 import { Button, Icon, List, ListItem } from 'react-native-elements';
 import AuthService from '../../Services/AuthService';
 import UserService from '../../Services/UserService';
@@ -41,6 +41,27 @@ export default class ClassDetails extends Component {
         }
         
     }
+
+    _requestLocationPermissions =  async () => {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.CAMERA,
+                {
+                    'title': 'Camera Permission',
+                    'message': 'Trackify needs to access your camera.'
+                }
+            )
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (err) {
+            console.warn(err)
+            return false;
+        }
+    }
+
 
     componentWillMount() {
         const classd = ClassService.getClass(this.state.classId, (classDets) => {
@@ -262,19 +283,24 @@ export default class ClassDetails extends Component {
         if (!this._isFormDataValid()) {
             alert("Please fill in the student's name first");
         } else {
-            this._openQRCodeScanner().then(deviceId=>{
-                if (deviceId != null) {
-                    this._linkStudentToClassByDeviceId(deviceId);
+            this._requestLocationPermissions().then(res => {
+                if (res == true) {
+                    this._openQRCodeScanner().then(deviceId => {
+                        if (deviceId != null) {
+                            this._linkStudentToClassByDeviceId(deviceId);
 
-                    this.setState({
-                        addStudentModal: false,
-                        firstName: null,
-                        lastName: null
+                            this.setState({
+                                addStudentModal: false,
+                                firstName: null,
+                                lastName: null
+                            });
+
+                        }
                     });
-                    
+                } else {
+                    alert("Camera Permissions is needed.");
                 }
-            });
-           
+            });  
         }
 
         this.setState({

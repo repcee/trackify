@@ -22,7 +22,7 @@ export default class SchoolLocation extends Component {
         const appState = {
             classAddressString,
             classLatitude,
-            classLongitude
+            classLongitude,
         } = this.props.navigation.getParam('appState');
 
         
@@ -45,10 +45,42 @@ export default class SchoolLocation extends Component {
             inputAddrZip: null,
 
             isFetchingAddr: false,
+            isLoading: true,
 
         };
+        
     }
 
+    componentDidMount() {
+        if (this.state.classLatitude && this.state.classLongitude) {
+            this.setState({
+                isLoading: false
+            });
+        }
+    }
+    componentWillMount() {
+        if (!this.state.classLatitude && !this.state.classLongitude) {
+            this._getUsersCurrentLocation();
+        }
+    }
+
+    _getUsersCurrentLocation = () => {
+        MapsService.getUsersCurrentLocation((res) => {
+            if (res !== null) {
+                this.setState({
+                    classLatitude: res.coords.latitude,
+                    classLongitude: res.coords.longitude,
+                    isLoading: false,
+
+                });
+            } else {
+                this.setState({
+                    locationError: true,
+                    isLoading: false,
+                })
+            }
+        });
+    }
 
     componentWillUnmount() {
         this.setState({
@@ -217,87 +249,98 @@ export default class SchoolLocation extends Component {
     }
 
     render() {
-        return (
-            <View style={[Styles.mainContainer]}>
-                <View style={[Styles.navbar]}>
+        if (!this.state.isLoading) {
+            return (
+                <View style={[Styles.mainContainer]}>
+                    <View style={[Styles.navbar]}>
 
-                    <View style={[Styles.navbarLeft]}>
-                        <Icon name="arrow-left" type="font-awesome"
-                            color={Colors.headerTextIcons} 
-                            onPress={() => this._handleBackButtonClicked()}
+                        <View style={[Styles.navbarLeft]}>
+                            <Icon name="arrow-left" type="font-awesome"
+                                color={Colors.headerTextIcons}
+                                onPress={() => this._handleBackButtonClicked()}
                             />
+                        </View>
+
+                        <Text style={[Styles.pageTitle]}>Class Location</Text>
+
+                        <View style={Styles.navbarRight}>
+                            <NormalText style={[Styles.textBold, Styles.textColorBlack]}
+                                onPress={() => this._handleBackButtonClicked()}>Done</NormalText>
+                        </View>
                     </View>
 
-                    <Text style={[Styles.pageTitle]}>Class Location</Text>
 
-                    <View style={Styles.navbarRight}>
-                    <NormalText style={[Styles.textBold, Styles.textColorBlack]} 
-                        onPress={() => this._handleBackButtonClicked()}>Done</NormalText>
-                    </View>
-                </View>
+                    <View style={[Styles.container]}>
+                        <View style={[Styles.marginB, { flex: 1, justifyContent: 'flex-start' }]}>
+                            {this._renderAddressInfo()}
+                        </View>
 
-
-                <View style={[Styles.container]}>
-                    <View style={[Styles.marginB, {flex: 1, justifyContent: 'flex-start'}]}>
-                        {this._renderAddressInfo()}
-                    </View>
-
-                    <View style={[Styles.marginNone, Styles.marginT, { flex: 3, alignItems: 'stretch' }]}>
-                        <MapView
-                            scrollEnabled={false} zoomEnabled={false} style={mapStyles.map}
-                            provider={PROVIDER_GOOGLE}
-                            region={{
-                                latitude: this.state.classLatitude,
-                                longitude: this.state.classLongitude,
-                                latitudeDelta: 0.005,
-                                longitudeDelta: 0.005,
-                            }}>
-                            
-                            <MapView.Marker draggable
-                                coordinate={{
+                        <View style={[Styles.marginNone, Styles.marginT, { flex: 3, alignItems: 'stretch' }]}>
+                            <MapView
+                                scrollEnabled={false} zoomEnabled={false} style={mapStyles.map}
+                                provider={PROVIDER_GOOGLE}
+                                region={{
                                     latitude: this.state.classLatitude,
                                     longitude: this.state.classLongitude,
-                                }}
-                                title={"Class Location"}
-                                description={this.state.classAddressString}
-                            />
-                        </MapView>
+                                    latitudeDelta: 0.005,
+                                    longitudeDelta: 0.005,
+                                }}>
+
+                                <MapView.Marker draggable
+                                    coordinate={{
+                                        latitude: this.state.classLatitude,
+                                        longitude: this.state.classLongitude,
+                                    }}
+                                    title={"Class Location"}
+                                    description={this.state.classAddressString}
+                                />
+                            </MapView>
+                        </View>
+
+                    </View>
+
+                    <Modal isVisible={this.state.changeAddressModalVisible} style={Styles.bottomModal}>
+                        <View style={Styles.modalContent}>
+                            <SubHeadingText>School/Class Address</SubHeadingText>
+                            <NormalInput placeholder="Address line 1" value={this.state.inputAddrLine1}
+                                onChangeText={(text) => this._handleAddressLine1Changed(text)} />
+
+                            <NormalInput placeholder="City" value={this.state.inputAddrCity}
+                                onChangeText={(text) => this._handleCityAddressChanged(text)} />
+
+                            <View style={[{ flexDirection: 'row' }, Styles.marginB]}>
+                                <NormalInput placeholder="State" value={this.state.inputAddrState} style={{ flex: 2 }}
+                                    onChangeText={(text) => this._handleStateAddressChanged(text)} />
+
+                                <NumericInput placeholder="Zip" value={this.state.inputAddrZip} style={{ flex: 1 }}
+                                    onChangeText={(text) => this._handleZipAddressChanged(text)} />
+                            </View>
+
+                            {
+                                this.state.isFetchingAddr ? (
+                                    <View style={[Styles.marginBLarge]}>
+                                        <ActivityIndicator size='large' color={Colors.primaryDark} />
+                                    </View>
+                                ) : (null)
+                            }
+
+                            <View>
+                                <AccentButton text={this.state.classAddressString ? "Update" : "Add"} onPress={() => { this._handleSubmitAddressChange() }} />
+                                <BlackButton style={[Styles.marginT]} text="Cancel" onPress={() => { this._handleCancelAddressChange() }} />
+                            </View>
+                        </View>
+                    </Modal>
+                </View>
+            );
+        } else {
+            return (
+                <View style={[Styles.mainContainer]}>
+                    <View style={[Styles.container, Styles.centerContents]}>
+                        <ActivityIndicator size='large' color={Colors.primaryDark} />
                     </View>
 
                 </View>
-
-                <Modal isVisible={this.state.changeAddressModalVisible} style={Styles.bottomModal}>
-                    <View style={Styles.modalContent}>
-                        <SubHeadingText>School/Class Address</SubHeadingText>
-                        <NormalInput placeholder="Address line 1" value={this.state.inputAddrLine1}
-                            onChangeText={(text) => this._handleAddressLine1Changed(text)} />
-
-                        <NormalInput placeholder="City" value={this.state.inputAddrCity}
-                            onChangeText={(text) => this._handleCityAddressChanged(text)} />
-
-                        <View style={[{ flexDirection: 'row' }, Styles.marginB]}>
-                            <NormalInput placeholder="State" value={this.state.inputAddrState} style={{ flex: 2 }}
-                                onChangeText={(text) => this._handleStateAddressChanged(text)} />
-
-                            <NumericInput placeholder="Zip" value={this.state.inputAddrZip} style={{ flex: 1 }}
-                                onChangeText={(text) => this._handleZipAddressChanged(text)} />
-                        </View>
-
-                        {
-                            this.state.isFetchingAddr ? (
-                                <View style={[Styles.marginBLarge]}>
-                                <ActivityIndicator size='large' color={Colors.primaryDark} />
-                            </View>
-                            ): (null)
-                        }
-                       
-                        <View>
-                            <AccentButton text={this.state.classAddressString ? "Update" : "Add"} onPress={() => { this._handleSubmitAddressChange() }} />
-                            <BlackButton style={[Styles.marginT]} text="Cancel" onPress={() => {this._handleCancelAddressChange()}}/>
-                        </View>
-                    </View>
-                </Modal>
-            </View>
-        );
+            );
+        }
     }
 }
